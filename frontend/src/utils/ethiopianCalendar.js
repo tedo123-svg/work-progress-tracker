@@ -129,12 +129,22 @@ export const getCurrentEthiopianDate = () => {
   let ethiopianDay = gregorianDay + ethiopianDayOffset;
   
   // Map Gregorian month to Ethiopian month
+  // Note: Ethiopian months transition around the 10th-11th of Gregorian months
   const monthMapping = {
     7: 1, 8: 2, 9: 3, 10: 4, 11: 5, 12: 6,
     1: 7, 2: 8, 3: 9, 4: 10, 5: 11, 6: 12
   };
   
   let ethiopianMonth = monthMapping[gregorianMonth] || 1;
+  
+  // Adjust for month transition
+  // If we're in the first ~10 days of a Gregorian month, we're still in the previous Ethiopian month
+  if (gregorianDay <= 10) {
+    ethiopianMonth = ethiopianMonth - 1;
+    if (ethiopianMonth < 1) {
+      ethiopianMonth = 12;
+    }
+  }
   
   // If day exceeds 30, move to next month
   if (ethiopianDay > 30) {
