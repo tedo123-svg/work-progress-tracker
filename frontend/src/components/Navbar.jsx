@@ -35,7 +35,7 @@ function Navbar({ user, onLogout }) {
               className="flex items-center space-x-2 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-4 py-2 rounded-xl transition transform hover:scale-105 shadow-lg"
             >
               <LogOut size={18} />
-              <span className="hidden sm:inline">Logout</span>
+              <span className="hidden sm:inline">ውጣ</span>
             </button>
           </div>
         </div>

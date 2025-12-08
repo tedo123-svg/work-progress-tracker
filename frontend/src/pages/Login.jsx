@@ -17,7 +17,7 @@ function Login({ onLogin }) {
       const response = await authAPI.login({ username, password });
       onLogin(response.data.user, response.data.token);
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed');
+      setError(err.response?.data?.error || 'መግባት አልተሳካም');
     } finally {
       setLoading(false);
     }
@@ -39,11 +39,11 @@ function Login({ onLogin }) {
             <BarChart3 size={40} className="text-white" />
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">
-            Work Progress Tracker
+            የስራ እድገት መከታተያ
           </h1>
           <p className="text-purple-200 flex items-center justify-center gap-2">
             <Sparkles size={16} />
-            Modern Reporting System
+            ዘመናዊ የሪፖርት ስርዓት
             <Sparkles size={16} />
           </p>
         </div>
@@ -51,8 +51,8 @@ function Login({ onLogin }) {
         {/* Login Card */}
         <div className="glass rounded-3xl shadow-2xl p-8 backdrop-blur-xl border border-white/20 animate-fade-in">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-white mb-2">Welcome Back</h2>
-            <p className="text-gray-300">Sign in to access your dashboard</p>
+            <h2 className="text-2xl font-bold text-white mb-2">እንኳን ደህና መጡ</h2>
+            <p className="text-gray-300">ወደ ዳሽቦርድዎ ለመድረስ ይግቡ</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -64,7 +64,7 @@ function Login({ onLogin }) {
 
             <div>
               <label className="block text-sm font-medium text-gray-200 mb-2">
-                Username
+                የተጠቃሚ ስም
               </label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -73,7 +73,7 @@ function Login({ onLogin }) {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm"
-                  placeholder="Enter your username"
+                  placeholder="የተጠቃሚ ስምዎን ያስገቡ"
                   required
                 />
               </div>
@@ -81,7 +81,7 @@ function Login({ onLogin }) {
 
             <div>
               <label className="block text-sm font-medium text-gray-200 mb-2">
-                Password
+                የይለፍ ቃል
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -90,7 +90,7 @@ function Login({ onLogin }) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm"
-                  placeholder="Enter your password"
+                  placeholder="የይለፍ ቃልዎን ያስገቡ"
                   required
                 />
               </div>
@@ -104,10 +104,10 @@ function Login({ onLogin }) {
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  Signing in...
+                  በመግባት ላይ...
                 </span>
               ) : (
-                'Sign In'
+                'ግባ'
               )}
             </button>
           </form>
@@ -115,7 +115,7 @@ function Login({ onLogin }) {
 
         {/* Footer */}
         <p className="text-center text-gray-400 text-sm mt-6">
-          © 2025 Work Progress Tracker. All rights reserved.
+          © 2025 የስራ እድገት መከታተያ። ሁሉም መብቶች የተጠበቁ ናቸው።
         </p>
       </div>
     </div>

@@ -40,7 +40,7 @@ function CreateAnnualPlan({ user, onLogout }) {
           className="flex items-center space-x-2 text-purple-300 hover:text-white mb-6 transition group"
         >
           <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-          <span>Back to Dashboard</span>
+          <span>ወደ ዳሽቦርድ ተመለስ</span>
         </button>
 
         <div className="max-w-3xl mx-auto glass rounded-3xl shadow-2xl p-8 backdrop-blur-xl border border-white/20 animate-slide-in">
@@ -49,10 +49,10 @@ function CreateAnnualPlan({ user, onLogout }) {
               <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
                 <ArrowLeft size={24} className="text-white rotate-180" />
               </div>
-              Create Annual Plan
+              የዓመታዊ እቅድ ፍጠር
             </h1>
             <p className="text-purple-200">
-              The system will automatically split this into 12 monthly periods and create reports for all branch users
+              ስርዓቱ በራስ-ሰር ወደ 12 ወርሃዊ ጊዜዎች ይከፍለዋል እና ለሁሉም የቅርንጫፍ ተጠቃሚዎች ሪፖርቶችን ይፈጥራል
             </p>
           </div>
 
@@ -65,34 +65,34 @@ function CreateAnnualPlan({ user, onLogout }) {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-purple-200 mb-2">
-                Plan Title *
+                የእቅድ ርዕስ *
               </label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm"
-                placeholder="e.g., 2025 Sales Target"
+                placeholder="ለምሳሌ፣ 2025 የሽያጭ ዒላማ"
                 required
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-purple-200 mb-2">
-                Description
+                መግለጫ
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm resize-none"
                 rows="4"
-                placeholder="Describe the annual plan objectives..."
+                placeholder="የዓመታዊ እቅድ አላማዎችን ይግለጹ..."
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-purple-200 mb-2">
-                Year *
+                ዓመት *
               </label>
               <input
                 type="number"
@@ -106,18 +106,18 @@ function CreateAnnualPlan({ user, onLogout }) {
 
             <div>
               <label className="block text-sm font-medium text-purple-200 mb-2">
-                Target Number *
+                ዒላማ ቁጥር *
               </label>
               <input
                 type="number"
                 value={formData.targetAmount}
                 onChange={(e) => setFormData({ ...formData, targetAmount: parseFloat(e.target.value) })}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm"
-                placeholder="e.g., 1000 (number of people)"
+                placeholder="ለምሳሌ፣ 1000 (የሰዎች ብዛት)"
                 step="0.01"
                 required
               />
-              <p className="text-sm text-purple-300 mt-2">Enter the target number of people or items to track</p>
+              <p className="text-sm text-purple-300 mt-2">ለመከታተል የዒላማ ቁጥር ያስገቡ</p>
             </div>
 
             <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-400/30 rounded-xl p-5 backdrop-blur-sm">
@@ -125,24 +125,24 @@ function CreateAnnualPlan({ user, onLogout }) {
                 <div className="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center">
                   <span className="text-white text-xs">✓</span>
                 </div>
-                What happens next?
+                ምን ይከሰታል?
               </h3>
               <ul className="text-sm text-blue-100 space-y-2">
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
-                  12 monthly periods will be auto-generated
+                  12 ወርሃዊ ጊዜዎች በራስ-ሰር ይፈጠራሉ
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
-                  Monthly targets will be evenly distributed
+                  ወርሃዊ ዒላማዎች በእኩል ይከፋፈላሉ
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 bg-pink-400 rounded-full"></div>
-                  Reports will be created for all 10 branch users
+                  ለሁሉም 10 የቅርንጫፍ ተጠቃሚዎች ሪፖርቶች ይፈጠራሉ
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full"></div>
-                  Deadlines will be set to the last day of each month
+                  የመጨረሻ ቀናት በእያንዳንዱ ወር 18ኛ ቀን ይቀመጣሉ
                 </li>
               </ul>
             </div>
@@ -156,10 +156,10 @@ function CreateAnnualPlan({ user, onLogout }) {
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    Creating...
+                    በመፍጠር ላይ...
                   </span>
                 ) : (
-                  'Create Annual Plan'
+                  'የዓመታዊ እቅድ ፍጠር'
                 )}
               </button>
               
@@ -168,7 +168,7 @@ function CreateAnnualPlan({ user, onLogout }) {
                 onClick={() => navigate('/')}
                 className="px-8 py-3 bg-white/10 border border-white/20 rounded-xl hover:bg-white/20 transition text-white font-semibold"
               >
-                Cancel
+                ሰርዝ
               </button>
             </div>
           </form>

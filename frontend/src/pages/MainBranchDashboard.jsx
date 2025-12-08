@@ -33,9 +33,9 @@ function MainBranchDashboard({ user, onLogout }) {
           <div>
             <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
               <Sparkles className="text-yellow-400" size={32} />
-              Main Branch Dashboard
+              ዋና ቅርንጫፍ ዳሽቦርድ
             </h1>
-            <p className="text-purple-200">Manage annual plans and monitor progress across all branches</p>
+            <p className="text-purple-200">የዓመታዊ እቅዶችን ያስተዳድሩ እና በሁሉም ቅርንጫፎች ላይ እድገትን ይከታተሉ</p>
           </div>
           
           <Link
@@ -43,30 +43,30 @@ function MainBranchDashboard({ user, onLogout }) {
             className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-xl transition transform hover:scale-105 shadow-lg"
           >
             <Plus size={20} />
-            <span className="font-semibold">Create Annual Plan</span>
+            <span className="font-semibold">የዓመታዊ እቅድ ፍጠር</span>
           </Link>
         </div>
 
         {loading ? (
           <div className="text-center py-20">
             <div className="inline-block w-16 h-16 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
-            <p className="text-purple-200 mt-4">Loading plans...</p>
+            <p className="text-purple-200 mt-4">እቅዶች በመጫን ላይ...</p>
           </div>
         ) : plans.length === 0 ? (
           <div className="glass rounded-3xl shadow-2xl p-16 text-center backdrop-blur-xl border border-white/20 animate-fade-in">
             <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
               <Calendar size={48} className="text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3">No Annual Plans Yet</h3>
+            <h3 className="text-2xl font-bold text-white mb-3">እስካሁን ምንም የዓመታዊ እቅዶች የሉም</h3>
             <p className="text-purple-200 mb-8 max-w-md mx-auto">
-              Get started by creating your first annual plan. The system will automatically split it into monthly periods.
+              የመጀመሪያውን የዓመታዊ እቅድዎን በመፍጠር ይጀምሩ። ስርዓቱ በራስ-ሰር ወደ ወርሃዊ ጊዜዎች ይከፍለዋል።
             </p>
             <Link
               to="/create-plan"
               className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-xl transition transform hover:scale-105 shadow-lg font-semibold"
             >
               <Plus size={20} />
-              <span>Create Your First Plan</span>
+              <span>የመጀመሪያውን እቅድዎን ይፍጠሩ</span>
             </Link>
           </div>
         ) : (
@@ -93,7 +93,7 @@ function MainBranchDashboard({ user, onLogout }) {
                       <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-4 border border-blue-400/30">
                         <div className="flex items-center gap-2 text-blue-300 text-sm mb-1">
                           <Calendar size={16} />
-                          Year
+                          ዓመት
                         </div>
                         <div className="text-2xl font-bold text-white">{plan.year}</div>
                       </div>
@@ -101,7 +101,7 @@ function MainBranchDashboard({ user, onLogout }) {
                       <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-sm rounded-xl p-4 border border-green-400/30">
                         <div className="flex items-center gap-2 text-green-300 text-sm mb-1">
                           <Target size={16} />
-                          Target Number
+                          ዒላማ ቁጥር
                         </div>
                         <div className="text-2xl font-bold text-white">
                           {plan.target_amount?.toLocaleString()}
@@ -111,7 +111,7 @@ function MainBranchDashboard({ user, onLogout }) {
                     
                     <div className="flex items-center gap-2 text-sm text-purple-300">
                       <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                      Created by {plan.creator_name} on {new Date(plan.created_at).toLocaleDateString()}
+                      በ {plan.creator_name} የተፈጠረ በ {new Date(plan.created_at).toLocaleDateString()}
                     </div>
                   </div>
                   
@@ -121,7 +121,7 @@ function MainBranchDashboard({ user, onLogout }) {
                       className="flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-3 rounded-xl transition transform hover:scale-105 shadow-lg font-semibold flex-1 lg:flex-initial"
                     >
                       <Eye size={18} />
-                      <span>View Details</span>
+                      <span>ዝርዝር ይመልከቱ</span>
                     </Link>
                     
                     <Link
@@ -129,7 +129,7 @@ function MainBranchDashboard({ user, onLogout }) {
                       className="flex items-center justify-center space-x-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-xl transition transform hover:scale-105 shadow-lg font-semibold flex-1 lg:flex-initial"
                     >
                       <Users size={18} />
-                      <span>Comparison</span>
+                      <span>ንጽጽር</span>
                     </Link>
                   </div>
                 </div>
