@@ -14,8 +14,8 @@ function Navbar({ user, onLogout }) {
               <BarChart3 size={24} className="text-white" />
             </div>
             <div>
-              <span className="text-xl font-bold text-white block">Work Progress</span>
-              <span className="text-xs text-purple-300">Tracker System</span>
+              <span className="text-xl font-bold text-white block">{t('የስራ እድገት', 'Work Progress')}</span>
+              <span className="text-xs text-purple-300">{t('መከታተያ ስርዓት', 'Tracker System')}</span>
             </div>
           </Link>
           

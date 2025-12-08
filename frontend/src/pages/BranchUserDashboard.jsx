@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import { reportAPI } from '../services/api';
 import Navbar from '../components/Navbar';
 import { FileText, Clock, CheckCircle, AlertCircle, TrendingUp, Target, Award } from 'lucide-react';
-import { filterFutureReports, getCurrentEthiopianMonth } from '../utils/ethiopianCalendar';
+import { filterFutureReports, getCurrentEthiopianMonth, getEthiopianMonthName } from '../utils/ethiopianCalendar';
 import { useLanguage } from '../contexts/LanguageContext';
 
 function BranchUserDashboard({ user, onLogout }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -44,10 +44,16 @@ function BranchUserDashboard({ user, onLogout }) {
       late: <AlertCircle size={14} />,
     };
     
+    const statusText = {
+      pending: t('በመጠባበቅ ላይ', 'Pending'),
+      submitted: t('ገብቷል', 'Submitted'),
+      late: t('ዘግይቷል', 'Late'),
+    };
+    
     return (
       <span className={`flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-semibold border backdrop-blur-sm ${styles[status]}`}>
         {icons[status]}
-        <span className="capitalize">{status}</span>
+        <span>{statusText[status]}</span>
       </span>
     );
   };
@@ -167,7 +173,7 @@ function BranchUserDashboard({ user, onLogout }) {
                     <tr key={report.id} className="hover:bg-white/5 transition">
                       <td className="px-6 py-4 text-sm text-white font-medium">{report.plan_title}</td>
                       <td className="px-6 py-4 text-sm text-purple-200">
-                        {new Date(report.year, report.month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                        {getEthiopianMonthName(report.month, language === 'am' ? 'amharic' : 'english')} {report.year}
                       </td>
                       <td className="px-6 py-4 text-sm text-green-300 font-semibold">
                         {report.target_amount?.toLocaleString()}

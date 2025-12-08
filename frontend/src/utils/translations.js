@@ -219,6 +219,66 @@ export const translations = {
     mustBePositive: 'ቁጥሩ አዎንታዊ መሆን አለበት',
     mustBeGreaterThan: 'ቁጥሩ ከ {value} የበለጠ መሆን አለበት',
   },
+
+  // Additional translations for pages
+  pages: {
+    // ViewAnnualPlan
+    backToDashboard: 'ወደ ዳሽቦርድ ተመለስ',
+    createActions: 'ተግባራት ፍጠር',
+    planNotFound: 'እቅድ አልተገኘም',
+    monthlyTargets: 'ወርሃዊ ዒላማዎች',
+    quarterlyProgress: 'ሩብ ዓመታዊ እድገት',
+    monthlyBreakdown: 'ወርሃዊ ክፍፍል',
+    
+    // SubmitReport
+    monthlyReport: 'ወርሃዊ ሪፖርት',
+    targetAmount: 'ዒላማ መጠን',
+    targetUnits: 'ዒላማ ክፍሎች',
+    onTime: 'በጊዜው',
+    overdue: 'ዘግይቷል',
+    previouslySubmitted: 'ቀደም ብሎ ገብቷል በ',
+    
+    // ActionReports
+    totalActions: 'ጠቅላላ ተግባራት',
+    noActionReportsAvailable: 'ምንም የተግባር ሪፖርቶች የሉም',
+    actionReportsWillAppear: 'የተግባር ሪፖርቶች የሚታዩት በዋና ቅርንጫፍ ተግባራት ከተፈጠሩ በኋላ ነው',
+    loadingActionReports: 'የተግባር ሪፖርቶች በመጫን ላይ...',
+    planActivity: 'የእቅድ እንቅስቃሴ',
+    actual: 'ትክክለኛ',
+    
+    // CreateActions
+    backToPlan: 'ወደ እቅድ ተመለስ',
+    defineActions: 'ተግባራትን በእቅድ ቁጥሮች እና ዒላማ እንቅስቃሴዎች ይግለጹ። ቅርንጫፎች የተጠናቀቁ ትክክለኛ እንቅስቃሴዎችን ሪፖርት ያደርጋሉ።',
+    actionTitle: 'የተግባር ርዕስ',
+    addAnotherAction: 'ሌላ ተግባር ያክሉ',
+    howItWorks: 'እንዴት ይሰራል',
+    branchesWillSee: 'ቅርንጫፎች እነዚህን ተግባራት በወርሃዊ ሪፖርቶቻቸው ውስጥ ያያሉ',
+    theyInputActual: 'የተጠናቀቁ ትክክለኛ እንቅስቃሴዎችን ያስገባሉ',
+    systemCalculates: 'ስርዓቱ በራስ-ሰር ያሰላል: (ትክክለኛ / እቅድ) × 100%',
+    youCanView: 'ሁሉንም ማስገባቶች ማየት እና እድገትን መከታተል ይችላሉ',
+    creating: 'በመፍጠር ላይ...',
+    
+    // SubmitActionReport
+    backToActionReports: 'ወደ የተግባር ሪፖርቶች ተመለስ',
+    actionReport: 'የተግባር ሪፖርት',
+    actualActivityCompleted: 'የተጠናቀቀ ትክክለኛ እንቅስቃሴ',
+    enterActualActivity: 'የተጠናቀቀውን ትክክለኛ እንቅስቃሴ ያስገቡ',
+    implementationPercentage: 'የትግበራ መቶኛ',
+    calculation: 'ስሌት',
+    
+    // BranchComparison
+    branchPerformanceComparison: 'የቅርንጫፍ አፈጻጸም ንጽጽር',
+    compareProgress: 'በሁሉም ቅርንጫፎች መካከል እድገትን ያወዳድሩ',
+    topPerformer: 'ከፍተኛ አፈጻጸም ያለው',
+    averageProgress: 'አማካይ እድገት',
+    progressComparison: 'የእድገት ንጽጽር',
+    detailedBranchStatistics: 'ዝርዝር የቅርንጫፍ ስታቲስቲክስ',
+    rank: 'ደረጃ',
+    totalReports: 'ጠቅላላ ሪፖርቶች',
+    totalAchieved: 'ጠቅላላ የተሳካ',
+    avgProgress: 'አማካይ እድገት',
+    trend: 'አዝማሚያ',
+  },
 };
 
 // Helper function to get translation
