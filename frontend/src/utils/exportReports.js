@@ -6,21 +6,24 @@ import { saveAs } from 'file-saver';
 import { calculateGrade } from './grading';
 import { getEthiopianMonthName } from './ethiopianCalendar';
 
-// Export to PDF
+// Export to PDF (Note: PDF uses English labels due to font limitations)
 export const exportToPDF = (reports, month, year, language = 'en') => {
   try {
     console.log('Exporting to PDF:', { reports, month, year, language });
     const doc = new jsPDF();
     
+    // Note: Using English for PDF due to jsPDF font limitations with Amharic
+    const pdfLang = 'en';
+    
     // Title
     doc.setFontSize(18);
-    doc.text(language === 'am' ? 'የወርሃዊ እድገት ሪፖርት' : 'Monthly Progress Report', 14, 20);
+    doc.text('Monthly Progress Report', 14, 20);
   
   // Month and Year
   doc.setFontSize(12);
-  const monthName = getEthiopianMonthName(month, language === 'am' ? 'amharic' : 'english');
-  doc.text(`${language === 'am' ? 'ወር' : 'Month'}: ${monthName} ${year}`, 14, 30);
-  doc.text(`${language === 'am' ? 'ቀን' : 'Date'}: ${new Date().toLocaleDateString()}`, 14, 37);
+  const monthName = getEthiopianMonthName(month, 'english'); // Always use English for PDF
+  doc.text(`Month: ${monthName} ${year}`, 14, 30);
+  doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 37);
   
   // Table
   const tableData = reports.map(report => {
@@ -31,21 +34,21 @@ export const exportToPDF = (reports, month, year, language = 'en') => {
       (Number(report.achieved_amount) || 0).toLocaleString(),
       `${(Number(report.progress_percentage) || 0).toFixed(1)}%`,
       gradeInfo.grade,
-      report.status === 'submitted' ? (language === 'am' ? 'ገብቷል' : 'Submitted') :
-      report.status === 'late' ? (language === 'am' ? 'ዘግይቷል' : 'Late') :
-      (language === 'am' ? 'በመጠባበቅ ላይ' : 'Pending')
+      report.status === 'submitted' ? 'Submitted' :
+      report.status === 'late' ? 'Late' :
+      'Pending'
     ];
   });
   
   doc.autoTable({
     startY: 45,
     head: [[
-      language === 'am' ? 'ቅርንጫፍ' : 'Branch',
-      language === 'am' ? 'ዒላማ' : 'Target',
-      language === 'am' ? 'የተሳካ' : 'Achieved',
-      language === 'am' ? 'እድገት' : 'Progress',
-      language === 'am' ? 'ደረጃ' : 'Grade',
-      language === 'am' ? 'ሁኔታ' : 'Status'
+      'Branch',
+      'Target',
+      'Achieved',
+      'Progress',
+      'Grade',
+      'Status'
     ]],
     body: tableData,
     theme: 'grid',
@@ -58,7 +61,7 @@ export const exportToPDF = (reports, month, year, language = 'en') => {
   
   // Chart Title
   doc.setFontSize(16);
-  doc.text(language === 'am' ? 'የእድገት ግራፍ' : 'Progress Chart', 14, 20);
+  doc.text('Progress Chart', 14, 20);
   
   // Sort reports by progress for better visualization
   const sortedReports = [...reports].sort((a, b) => 
@@ -138,7 +141,7 @@ export const exportToPDF = (reports, month, year, language = 'en') => {
   const pieY = chartStartY + chartHeight + 40;
   doc.setFontSize(14);
   doc.setTextColor(0);
-  doc.text(language === 'am' ? 'የደረጃ ስርጭት' : 'Grade Distribution', 14, pieY);
+  doc.text('Grade Distribution', 14, pieY);
   
   // Calculate grade distribution
   const gradeDistribution = {};
@@ -236,11 +239,12 @@ export const exportToPDF = (reports, month, year, language = 'en') => {
   
   doc.setFontSize(12);
   doc.setTextColor(0);
-  doc.text(language === 'am' ? 'ማጠቃለያ:' : 'Summary:', 14, summaryY);
+  doc.text('Summary:', 14, summaryY);
   doc.setFontSize(10);
-  doc.text(`${language === 'am' ? 'ጠቅላላ ዒላማ' : 'Total Target'}: ${totalTarget.toLocaleString()}`, 14, summaryY + 7);
-  doc.text(`${language === 'am' ? 'ጠቅላላ የተሳካ' : 'Total Achieved'}: ${totalAchieved.toLocaleString()}`, 14, summaryY + 14);
-  doc.text(`${language === 'am' ? 'አማካይ እድገት' : 'Average Progress'}: ${(Number(avgProgress) || 0).toFixed(1)}%`, 14, summaryY + 21);
+  doc.text(`Total Target: ${totalTarget.toLocaleString()}`, 14, summaryY + 7);
+  doc.text(`Total Achieved: ${totalAchieved.toLocaleString()}`, 14, summaryY + 14);
+  doc.text(`Average Progress: ${(Number(avgProgress) || 0).toFixed(1)}%`, 14, summaryY + 21);
+  doc.text(`Total Reports: ${reports.length}`, 14, summaryY + 28);
   
   // Save
     doc.save(`monthly-report-${monthName}-${year}.pdf`);
