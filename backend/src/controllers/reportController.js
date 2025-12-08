@@ -173,3 +173,31 @@ export const getBranchComparison = async (req, res) => {
     res.status(500).json({ error: 'Failed to get branch comparison' });
   }
 };
+
+
+// Get all branch reports for current monthly plan (for main branch dashboard)
+export const getAllCurrentMonthReports = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT mr.*, mp.month, mp.year, mp.target_amount, mp.target_units, mp.deadline,
+              u.username, u.branch_name, ap.title as plan_title
+       FROM monthly_reports mr
+       JOIN monthly_periods mp ON mr.monthly_period_id = mp.id
+       JOIN annual_plans ap ON mp.annual_plan_id = ap.id
+       JOIN users u ON mr.branch_user_id = u.id
+       WHERE mp.month = (
+         SELECT month FROM monthly_periods 
+         WHERE annual_plan_id = ap.id 
+         ORDER BY year DESC, month DESC 
+         LIMIT 1
+       )
+       ORDER BY u.branch_name, mr.status`,
+      []
+    );
+    
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Get all current month reports error:', error);
+    res.status(500).json({ error: 'Failed to get current month reports' });
+  }
+};

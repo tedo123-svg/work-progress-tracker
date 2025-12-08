@@ -31,6 +31,7 @@ export const reportAPI = {
   getMyReports: () => api.get('/reports/my-reports'),
   getAllReports: (planId) => api.get(`/reports/plan/${planId}`),
   getBranchComparison: (planId) => api.get(`/reports/comparison/${planId}`),
+  getAllCurrentMonthReports: () => api.get('/reports/current-month/all'),
 };
 
 export const actionAPI = {

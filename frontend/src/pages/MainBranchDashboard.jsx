@@ -14,9 +14,12 @@ function MainBranchDashboard({ user, onLogout }) {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [newTarget, setNewTarget] = useState('');
   const [updating, setUpdating] = useState(false);
+  const [allReports, setAllReports] = useState([]);
+  const [loadingReports, setLoadingReports] = useState(false);
 
   useEffect(() => {
     fetchCurrentPlan();
+    fetchAllReports();
   }, []);
 
   const fetchCurrentPlan = async () => {
@@ -37,6 +40,19 @@ function MainBranchDashboard({ user, onLogout }) {
     }
   };
 
+  const fetchAllReports = async () => {
+    setLoadingReports(true);
+    try {
+      // Get all reports for current month from all branches
+      const response = await reportAPI.getAllCurrentMonthReports();
+      setAllReports(response.data);
+    } catch (error) {
+      console.error('Failed to fetch all reports:', error);
+    } finally {
+      setLoadingReports(false);
+    }
+  };
+
   const handleUpdateTarget = async () => {
     setUpdating(true);
     try {
@@ -49,6 +65,26 @@ function MainBranchDashboard({ user, onLogout }) {
     } finally {
       setUpdating(false);
     }
+  };
+
+  const getStatusBadge = (status) => {
+    const styles = {
+      pending: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
+      submitted: 'bg-green-500/20 text-green-300 border-green-400/30',
+      late: 'bg-red-500/20 text-red-300 border-red-400/30',
+    };
+    
+    const statusText = {
+      pending: t('በመጠባበቅ ላይ', 'Pending'),
+      submitted: t('ገብቷል', 'Submitted'),
+      late: t('ዘግይቷል', 'Late'),
+    };
+    
+    return (
+      <span className={`flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-semibold border backdrop-blur-sm ${styles[status]}`}>
+        <span>{statusText[status]}</span>
+      </span>
+    );
   };
 
   return (
@@ -163,6 +199,81 @@ function MainBranchDashboard({ user, onLogout }) {
                     <div className="text-red-300 text-sm mb-1">{t('ዘግይቷል', 'Late')}</div>
                     <div className="text-2xl font-bold text-white">{stats.late_reports || 0}</div>
                   </div>
+                </div>
+              )}
+            </div>
+
+            {/* All Branch Reports */}
+            <div className="glass rounded-2xl shadow-xl backdrop-blur-xl border border-white/20">
+              <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <Users size={24} />
+                  {t('የሁሉም ቅርንጫፎች ሪፖርቶች', 'All Branch Reports')}
+                </h2>
+                <button
+                  onClick={fetchAllReports}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition text-white text-sm"
+                >
+                  <RefreshCw size={16} />
+                  {t('አድስ', 'Refresh')}
+                </button>
+              </div>
+              
+              {loadingReports ? (
+                <div className="text-center py-12">
+                  <div className="inline-block w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
+                  <p className="text-purple-200 mt-4">{t('ሪፖርቶች በመጫን ላይ...', 'Loading reports...')}</p>
+                </div>
+              ) : allReports.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-purple-200">{t('ምንም ሪፖርቶች የሉም', 'No reports available')}</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-white/5 border-b border-white/10">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">{t('ቅርንጫፍ', 'Branch')}</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">{t('እቅድ', 'Plan')}</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">{t('ዒላማ', 'Target')}</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">{t('የተሳካ', 'Achieved')}</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">{t('እድገት', 'Progress')}</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">{t('ሁኔታ', 'Status')}</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">{t('የገባበት ቀን', 'Submitted')}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/10">
+                      {allReports.map((report) => (
+                        <tr key={report.id} className="hover:bg-white/5 transition">
+                          <td className="px-6 py-4 text-sm text-white font-medium">{report.branch_name}</td>
+                          <td className="px-6 py-4 text-sm text-purple-200">{report.plan_title}</td>
+                          <td className="px-6 py-4 text-sm text-green-300 font-semibold">
+                            {report.target_amount?.toLocaleString()}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-blue-300 font-semibold">
+                            {report.achieved_amount?.toLocaleString() || '0'}
+                          </td>
+                          <td className="px-6 py-4 text-sm">
+                            <div className="flex items-center space-x-3">
+                              <div className="flex-1 bg-white/10 rounded-full h-2 min-w-[80px]">
+                                <div
+                                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
+                                  style={{ width: `${Math.min(report.progress_percentage || 0, 100)}%` }}
+                                />
+                              </div>
+                              <span className="text-xs font-bold text-white min-w-[45px]">
+                                {(Number(report.progress_percentage) || 0).toFixed(1)}%
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">{getStatusBadge(report.status)}</td>
+                          <td className="px-6 py-4 text-sm text-purple-200">
+                            {report.submitted_at ? new Date(report.submitted_at).toLocaleString() : '-'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>
