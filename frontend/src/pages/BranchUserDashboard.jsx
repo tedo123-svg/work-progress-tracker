@@ -19,11 +19,11 @@ function BranchUserDashboard({ user, onLogout }) {
     try {
       const response = await reportAPI.getMyReports();
       
-      // Filter reports to show only future months based on Ethiopian calendar
-      // Currently in month 5 (ጥር - Tir), so show months 6-12
-      const filteredReports = filterFutureReports(response.data);
+      // Show only current month's reports (monthly auto-renewal system)
+      const currentMonth = getCurrentEthiopianMonth();
+      const currentMonthReports = response.data.filter(r => r.month === currentMonth);
       
-      setReports(filteredReports);
+      setReports(currentMonthReports);
     } catch (error) {
       console.error('Failed to fetch reports:', error);
     } finally {
@@ -78,7 +78,7 @@ function BranchUserDashboard({ user, onLogout }) {
                 <Award className="text-yellow-400" size={32} />
                 {t('ቅርንጫፍ ዳሽቦርድ', 'Branch Dashboard')}
               </h1>
-              <p className="text-purple-200">{t('የወርሃዊ ሪፖርቶችዎን ያስገቡ እና ይከታተሉ (የሚመጡ ወራትን ብቻ በማሳየት ላይ)', 'Submit and track your monthly reports (Showing upcoming months only)')}</p>
+              <p className="text-purple-200">{t('የወርሃዊ ሪፖርቶችዎን ያስገቡ እና ይከታተሉ (የአሁኑን ወር ብቻ በማሳየት ላይ)', 'Submit and track your monthly reports (Showing current month only)')}</p>
             </div>
             
             <Link

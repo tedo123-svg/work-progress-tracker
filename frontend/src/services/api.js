@@ -42,4 +42,12 @@ export const actionAPI = {
   getSummary: (planId) => api.get(`/actions/summary/${planId}`),
 };
 
+export const monthlyPlanAPI = {
+  getCurrent: () => api.get('/monthly-plans/current'),
+  updateTarget: (targetAmount) => api.put('/monthly-plans/current/target', { targetAmount }),
+  getHistory: () => api.get('/monthly-plans/history'),
+  getStats: (planId) => api.get(`/monthly-plans/${planId}/stats`),
+  checkRenewal: () => api.post('/monthly-plans/check-renewal'),
+};
+
 export default api;
