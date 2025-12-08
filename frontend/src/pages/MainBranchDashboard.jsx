@@ -403,7 +403,7 @@ function MainBranchDashboard({ user, onLogout }) {
                               </div>
                             </div>
                             <div className={`text-2xl font-bold ${gradeInfo.color}`}>
-                              {branch.progress.toFixed(1)}%
+                              {(Number(branch.progress) || 0).toFixed(1)}%
                             </div>
                           </div>
                         );
@@ -431,7 +431,7 @@ function MainBranchDashboard({ user, onLogout }) {
                           </div>
                           <span className="text-white font-semibold">{branch.name}</span>
                         </div>
-                        <div className="text-2xl font-bold text-yellow-300">{branch.progress.toFixed(1)}%</div>
+                        <div className="text-2xl font-bold text-yellow-300">{(Number(branch.progress) || 0).toFixed(1)}%</div>
                         <div className="text-sm text-yellow-100 mt-1">
                           {branch.achieved.toLocaleString()} / {branch.target.toLocaleString()}
                         </div>
