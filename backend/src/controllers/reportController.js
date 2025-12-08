@@ -179,18 +179,13 @@ export const getBranchComparison = async (req, res) => {
 export const getAllCurrentMonthReports = async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT mr.*, mp.month, mp.year, mp.target_amount, mp.target_units, mp.deadline,
-              u.username, u.branch_name, ap.title as plan_title
+      `SELECT mr.*, mp.month, mp.year, mp.target_amount, mp.deadline,
+              u.username, u.branch_name, mp.title as plan_title,
+              mr.status, mr.achieved_amount, mr.progress_percentage, mr.submitted_at
        FROM monthly_reports mr
-       JOIN monthly_periods mp ON mr.monthly_period_id = mp.id
-       JOIN annual_plans ap ON mp.annual_plan_id = ap.id
+       JOIN monthly_plans mp ON mr.monthly_plan_id = mp.id
        JOIN users u ON mr.branch_user_id = u.id
-       WHERE mp.month = (
-         SELECT month FROM monthly_periods 
-         WHERE annual_plan_id = ap.id 
-         ORDER BY year DESC, month DESC 
-         LIMIT 1
-       )
+       WHERE mp.status = 'active'
        ORDER BY u.branch_name, mr.status`,
       []
     );
