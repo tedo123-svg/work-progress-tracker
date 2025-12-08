@@ -32,9 +32,9 @@ ORDER BY u.branch_name;
 -- Show updated statistics
 SELECT 
     COUNT(*) as total_reports,
-    SUM(CASE WHEN status = 'submitted' THEN 1 ELSE 0 END) as submitted,
-    SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-    SUM(CASE WHEN status = 'late' THEN 1 ELSE 0 END) as late
+    SUM(CASE WHEN mr.status = 'submitted' THEN 1 ELSE 0 END) as submitted,
+    SUM(CASE WHEN mr.status = 'pending' THEN 1 ELSE 0 END) as pending,
+    SUM(CASE WHEN mr.status = 'late' THEN 1 ELSE 0 END) as late
 FROM monthly_reports mr
 JOIN monthly_plans mp ON mr.monthly_plan_id = mp.id
 WHERE mp.status = 'active';
