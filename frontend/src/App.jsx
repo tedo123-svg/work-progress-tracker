@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { LanguageProvider } from './contexts/LanguageContext';
 import Login from './pages/Login';
 import MainBranchDashboard from './pages/MainBranchDashboard';
 import BranchUserDashboard from './pages/BranchUserDashboard';
@@ -42,7 +43,8 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
+    <LanguageProvider>
+      <BrowserRouter>
       <Routes>
         <Route 
           path="/login" 
@@ -100,6 +102,7 @@ function App() {
         />
       </Routes>
     </BrowserRouter>
+    </LanguageProvider>
   );
 }
 

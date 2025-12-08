@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
-import { LogOut, BarChart3, User, Sparkles } from 'lucide-react';
+import { LogOut, BarChart3, User, Sparkles, Languages } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 function Navbar({ user, onLogout }) {
+  const { language, toggleLanguage, t } = useLanguage();
+  
   return (
     <nav className="glass border-b border-white/10 sticky top-0 z-50 backdrop-blur-xl">
       <div className="container mx-auto px-6 py-4">
@@ -31,11 +34,20 @@ function Navbar({ user, onLogout }) {
             </div>
             
             <button
+              onClick={toggleLanguage}
+              className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-4 py-2 rounded-xl transition transform hover:scale-105 shadow-lg"
+              title={language === 'am' ? 'Switch to English' : 'ወደ አማርኛ ቀይር'}
+            >
+              <Languages size={18} />
+              <span className="hidden sm:inline font-semibold">{language === 'am' ? 'EN' : 'አማ'}</span>
+            </button>
+            
+            <button
               onClick={onLogout}
               className="flex items-center space-x-2 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-4 py-2 rounded-xl transition transform hover:scale-105 shadow-lg"
             >
               <LogOut size={18} />
-              <span className="hidden sm:inline">ውጣ</span>
+              <span className="hidden sm:inline">{t('ውጣ', 'Logout')}</span>
             </button>
           </div>
         </div>

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { authAPI } from '../services/api';
-import { BarChart3, Lock, User, Sparkles } from 'lucide-react';
+import { BarChart3, Lock, User, Sparkles, Languages } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 function Login({ onLogin }) {
+  const { language, toggleLanguage, t } = useLanguage();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -39,20 +41,29 @@ function Login({ onLogin }) {
             <BarChart3 size={40} className="text-white" />
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">
-            የስራ እድገት መከታተያ
+            {t('የስራ እድገት መከታተያ', 'Work Progress Tracker')}
           </h1>
           <p className="text-purple-200 flex items-center justify-center gap-2">
             <Sparkles size={16} />
-            ዘመናዊ የሪፖርት ስርዓት
+            {t('ዘመናዊ የሪፖርት ስርዓት', 'Modern Reporting System')}
             <Sparkles size={16} />
           </p>
+          
+          {/* Language Toggle */}
+          <button
+            onClick={toggleLanguage}
+            className="mt-4 flex items-center justify-center gap-2 mx-auto bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl transition backdrop-blur-sm border border-white/20"
+          >
+            <Languages size={18} />
+            <span className="text-sm font-semibold">{language === 'am' ? 'Switch to English' : 'ወደ አማርኛ ቀይር'}</span>
+          </button>
         </div>
 
         {/* Login Card */}
         <div className="glass rounded-3xl shadow-2xl p-8 backdrop-blur-xl border border-white/20 animate-fade-in">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-white mb-2">እንኳን ደህና መጡ</h2>
-            <p className="text-gray-300">ወደ ዳሽቦርድዎ ለመድረስ ይግቡ</p>
+            <h2 className="text-2xl font-bold text-white mb-2">{t('እንኳን ደህና መጡ', 'Welcome Back')}</h2>
+            <p className="text-gray-300">{t('ወደ ዳሽቦርድዎ ለመድረስ ይግቡ', 'Sign in to access your dashboard')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -64,7 +75,7 @@ function Login({ onLogin }) {
 
             <div>
               <label className="block text-sm font-medium text-gray-200 mb-2">
-                የተጠቃሚ ስም
+                {t('የተጠቃሚ ስም', 'Username')}
               </label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -73,7 +84,7 @@ function Login({ onLogin }) {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm"
-                  placeholder="የተጠቃሚ ስምዎን ያስገቡ"
+                  placeholder={t('የተጠቃሚ ስምዎን ያስገቡ', 'Enter your username')}
                   required
                 />
               </div>
@@ -81,7 +92,7 @@ function Login({ onLogin }) {
 
             <div>
               <label className="block text-sm font-medium text-gray-200 mb-2">
-                የይለፍ ቃል
+                {t('የይለፍ ቃል', 'Password')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -90,7 +101,7 @@ function Login({ onLogin }) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm"
-                  placeholder="የይለፍ ቃልዎን ያስገቡ"
+                  placeholder={t('የይለፍ ቃልዎን ያስገቡ', 'Enter your password')}
                   required
                 />
               </div>
@@ -104,10 +115,10 @@ function Login({ onLogin }) {
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  በመግባት ላይ...
+                  {t('በመግባት ላይ...', 'Signing in...')}
                 </span>
               ) : (
-                'ግባ'
+                t('ግባ', 'Sign In')
               )}
             </button>
           </form>
@@ -115,7 +126,7 @@ function Login({ onLogin }) {
 
         {/* Footer */}
         <p className="text-center text-gray-400 text-sm mt-6">
-          © 2025 የስራ እድገት መከታተያ። ሁሉም መብቶች የተጠበቁ ናቸው።
+          © 2025 {t('የስራ እድገት መከታተያ። ሁሉም መብቶች የተጠበቁ ናቸው።', 'Work Progress Tracker. All rights reserved.')}
         </p>
       </div>
     </div>
