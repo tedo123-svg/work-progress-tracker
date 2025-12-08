@@ -114,6 +114,7 @@ export const formatEthiopianDeadline = (gregorianDate, ethiopianMonth, language 
 
 /**
  * Get current Ethiopian date
+ * Simplified conversion: Adds approximately 21 days to Gregorian date
  * @returns {object} {day, month, year}
  */
 export const getCurrentEthiopianDate = () => {
@@ -122,13 +123,27 @@ export const getCurrentEthiopianDate = () => {
   const gregorianDay = now.getDate();
   const gregorianYear = now.getFullYear();
   
+  // Ethiopian calendar is approximately 21 days ahead
+  // December 8 (Gregorian) = Hidar 29 (Ethiopian)
+  const ethiopianDayOffset = 21;
+  let ethiopianDay = gregorianDay + ethiopianDayOffset;
+  
   // Map Gregorian month to Ethiopian month
   const monthMapping = {
     7: 1, 8: 2, 9: 3, 10: 4, 11: 5, 12: 6,
     1: 7, 2: 8, 3: 9, 4: 10, 5: 11, 6: 12
   };
   
-  const ethiopianMonth = monthMapping[gregorianMonth] || 1;
+  let ethiopianMonth = monthMapping[gregorianMonth] || 1;
+  
+  // If day exceeds 30, move to next month
+  if (ethiopianDay > 30) {
+    ethiopianDay = ethiopianDay - 30;
+    ethiopianMonth = ethiopianMonth + 1;
+    if (ethiopianMonth > 12) {
+      ethiopianMonth = 1;
+    }
+  }
   
   // Calculate Ethiopian year
   let ethiopianYear;
@@ -137,10 +152,6 @@ export const getCurrentEthiopianDate = () => {
   } else {
     ethiopianYear = gregorianYear - 8;
   }
-  
-  // Ethiopian day is approximately the same as Gregorian day
-  // (This is a simplification - exact conversion is more complex)
-  const ethiopianDay = gregorianDay;
   
   return { day: ethiopianDay, month: ethiopianMonth, year: ethiopianYear };
 };
