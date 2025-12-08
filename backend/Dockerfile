@@ -1,5 +1,7 @@
+# Use Node.js LTS version
 FROM node:18-alpine
 
+# Set working directory
 WORKDIR /app
 
 # Copy package files
@@ -8,11 +10,11 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install --production
 
-# Copy source code
+# Copy application files
 COPY . .
 
 # Expose port
 EXPOSE 5000
 
-# Wait for database and run migrations, then start server
-CMD ["sh", "-c", "sleep 10 && node src/database/migrate.js && node src/server.js"]
+# Start the application
+CMD ["npm", "start"]
