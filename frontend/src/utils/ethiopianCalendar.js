@@ -1,22 +1,23 @@
-// Ethiopian Calendar Utility
+// Ethiopian Government Fiscal Year Calendar
+// Starts with ሐምሌ (Hamle) and ends with ሰኔ (Sene)
 // Update CURRENT_ETHIOPIAN_MONTH when the month changes
 
-export const CURRENT_ETHIOPIAN_MONTH = 5; // Currently: ጥር (Tir) - 5th month
+export const CURRENT_ETHIOPIAN_MONTH = 5; // Currently: ኅዳር (Hidar) - 5th month
 
+// Ethiopian Government Fiscal Year - Month Order
 export const ETHIOPIAN_MONTHS = [
-  { number: 1, amharic: 'መስከረም', english: 'Meskerem' },
-  { number: 2, amharic: 'ጥቅምት', english: 'Tikimt' },
-  { number: 3, amharic: 'ኅዳር', english: 'Hidar' },
-  { number: 4, amharic: 'ታኅሣሥ', english: 'Tahsas' },
-  { number: 5, amharic: 'ጥር', english: 'Tir' },
-  { number: 6, amharic: 'የካቲት', english: 'Yekatit' },
-  { number: 7, amharic: 'መጋቢት', english: 'Megabit' },
-  { number: 8, amharic: 'ሚያዝያ', english: 'Miazia' },
-  { number: 9, amharic: 'ግንቦት', english: 'Ginbot' },
-  { number: 10, amharic: 'ሰኔ', english: 'Sene' },
-  { number: 11, amharic: 'ሐምሌ', english: 'Hamle' },
-  { number: 12, amharic: 'ነሐሴ', english: 'Nehase' },
-  { number: 13, amharic: 'ጳጉሜን', english: 'Pagumen' }
+  { number: 1, amharic: 'ሐምሌ', english: 'Hamle' },
+  { number: 2, amharic: 'ነሐሴ', english: 'Nehase' },
+  { number: 3, amharic: 'መስከረም', english: 'Meskerem' },
+  { number: 4, amharic: 'ጥቅምት', english: 'Tikimt' },
+  { number: 5, amharic: 'ኅዳር', english: 'Hidar' },
+  { number: 6, amharic: 'ታኅሣሥ', english: 'Tahsas' },
+  { number: 7, amharic: 'ጥር', english: 'Tir' },
+  { number: 8, amharic: 'የካቲት', english: 'Yekatit' },
+  { number: 9, amharic: 'መጋቢት', english: 'Megabit' },
+  { number: 10, amharic: 'ሚያዝያ', english: 'Miazia' },
+  { number: 11, amharic: 'ግንቦት', english: 'Ginbot' },
+  { number: 12, amharic: 'ሰኔ', english: 'Sene' }
 ];
 
 /**
