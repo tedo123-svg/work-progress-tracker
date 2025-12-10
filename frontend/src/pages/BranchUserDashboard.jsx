@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { reportAPI } from '../services/api';
 import Navbar from '../components/Navbar';
-import { FileText, Clock, CheckCircle, AlertCircle, TrendingUp, Target, Award } from 'lucide-react';
+import AchievementModal from '../components/AchievementModal';
+import { FileText, Clock, CheckCircle, AlertCircle, TrendingUp, Target, Award, Plus } from 'lucide-react';
 import { filterFutureReports, getCurrentEthiopianMonth, getEthiopianMonthName, formatEthiopianDeadline, getDaysUntilDeadline } from '../utils/ethiopianCalendar';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -10,6 +11,8 @@ function BranchUserDashboard({ user, onLogout }) {
   const { t, language } = useLanguage();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAchievementModal, setShowAchievementModal] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
 
   useEffect(() => {
     fetchReports();
@@ -18,17 +21,26 @@ function BranchUserDashboard({ user, onLogout }) {
   const fetchReports = async () => {
     try {
       const response = await reportAPI.getMyReports();
-      
+
       // Show only current month's reports (monthly auto-renewal system)
       const currentMonth = getCurrentEthiopianMonth();
       const currentMonthReports = response.data.filter(r => r.month === currentMonth);
-      
+
       setReports(currentMonthReports);
     } catch (error) {
       console.error('Failed to fetch reports:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOpenAchievementModal = (report) => {
+    setSelectedReport(report);
+    setShowAchievementModal(true);
+  };
+
+  const handleAchievementSuccess = () => {
+    fetchReports();
   };
 
   const getStatusBadge = (status) => {
@@ -206,12 +218,21 @@ function BranchUserDashboard({ user, onLogout }) {
                       </td>
                       <td className="px-6 py-4">{getStatusBadge(report.status)}</td>
                       <td className="px-6 py-4">
-                        <Link
-                          to={`/submit-report/${report.id}`}
-                          className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm font-semibold rounded-lg transition transform hover:scale-105"
-                        >
-                          {report.status === 'pending' ? t('አስገባ', 'Submit') : t('ይመልከቱ/አርትዕ', 'View/Edit')}
-                        </Link>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleOpenAchievementModal(report)}
+                            className="inline-flex items-center px-3 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white text-xs font-semibold rounded-lg transition transform hover:scale-105"
+                            title={t('ስኬት ያክሉ', 'Add Achievement')}
+                          >
+                            <Plus size={16} />
+                          </button>
+                          <Link
+                            to={`/submit-report/${report.id}`}
+                            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm font-semibold rounded-lg transition transform hover:scale-105"
+                          >
+                            {report.status === 'pending' ? t('አስገባ', 'Submit') : t('ይመልከቱ/አርትዕ', 'View/Edit')}
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -220,6 +241,13 @@ function BranchUserDashboard({ user, onLogout }) {
             </div>
           </div>
         )}
+
+        <AchievementModal
+          report={selectedReport}
+          isOpen={showAchievementModal}
+          onClose={() => setShowAchievementModal(false)}
+          onSuccess={handleAchievementSuccess}
+        />
       </div>
     </div>
   );

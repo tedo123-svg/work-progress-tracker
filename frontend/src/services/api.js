@@ -41,6 +41,7 @@ export const actionAPI = {
   submit: (data) => api.post('/actions/submit', data),
   getAllReports: (planId) => api.get(`/actions/reports/plan/${planId}`),
   getSummary: (planId) => api.get(`/actions/summary/${planId}`),
+  quickUpdate: (reportId, actualActivity) => api.put('/actions/quick-update', { reportId, actualActivity }),
 };
 
 export const monthlyPlanAPI = {

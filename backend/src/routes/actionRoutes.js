@@ -1,11 +1,12 @@
 import express from 'express';
-import { 
-  createActions, 
-  getActionsByPlan, 
-  getMyActionReports, 
+import {
+  createActions,
+  getActionsByPlan,
+  getMyActionReports,
   submitActionReport,
   getAllActionReports,
-  getActionSummaryByBranch
+  getActionSummaryByBranch,
+  quickUpdateAchievement
 } from '../controllers/actionController.js';
 import { authenticate, authorizeMainBranch, authorizeBranchUser } from '../middleware/auth.js';
 
@@ -20,5 +21,6 @@ router.get('/summary/:planId', authenticate, authorizeMainBranch, getActionSumma
 // Branch user routes
 router.get('/my-reports', authenticate, authorizeBranchUser, getMyActionReports);
 router.post('/submit', authenticate, authorizeBranchUser, submitActionReport);
+router.put('/quick-update', authenticate, authorizeBranchUser, quickUpdateAchievement);
 
 export default router;

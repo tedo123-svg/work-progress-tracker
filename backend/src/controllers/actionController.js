@@ -184,9 +184,9 @@ export const getAllActionReports = async (req, res) => {
 export const getActionSummaryByBranch = async (req, res) => {
   try {
     const { planId } = req.params;
-    
+
     const result = await pool.query(
-      `SELECT 
+      `SELECT
          u.id, u.username, u.branch_name,
          COUNT(ar.id) as total_actions,
          COUNT(CASE WHEN ar.status = 'submitted' THEN 1 END) as submitted_on_time,
@@ -201,10 +201,64 @@ export const getActionSummaryByBranch = async (req, res) => {
        ORDER BY avg_implementation DESC`,
       [planId]
     );
-    
+
     res.json(result.rows);
   } catch (error) {
     console.error('Get action summary error:', error);
     res.status(500).json({ error: 'Failed to get action summary' });
+  }
+};
+
+// Quick update achievement (similar to update target)
+export const quickUpdateAchievement = async (req, res) => {
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const { reportId, actualActivity } = req.body;
+
+    // Get report and action info
+    const reportResult = await client.query(
+      `SELECT ar.*, a.plan_activity, mp.deadline
+       FROM action_reports ar
+       JOIN actions a ON ar.action_id = a.id
+       JOIN monthly_periods mp ON ar.monthly_period_id = mp.id
+       WHERE ar.id = $1 AND ar.branch_user_id = $2`,
+      [reportId, req.user.id]
+    );
+
+    if (reportResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Action report not found' });
+    }
+
+    const report = reportResult.rows[0];
+
+    // Calculate implementation percentage
+    const implementationPercentage = (actualActivity / report.plan_activity) * 100;
+    const isLate = new Date() > new Date(report.deadline);
+
+    // Update action report
+    await client.query(
+      `UPDATE action_reports
+       SET actual_activity = $1, implementation_percentage = $2,
+           status = $3, submitted_at = NOW(), updated_at = NOW()
+       WHERE id = $4`,
+      [actualActivity, implementationPercentage, isLate ? 'late' : 'submitted', reportId]
+    );
+
+    await client.query('COMMIT');
+
+    res.json({
+      message: 'Achievement updated successfully',
+      actualActivity,
+      implementationPercentage
+    });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Quick update achievement error:', error);
+    res.status(500).json({ error: 'Failed to update achievement' });
+  } finally {
+    client.release();
   }
 };
