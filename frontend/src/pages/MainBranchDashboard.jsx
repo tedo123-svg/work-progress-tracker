@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { monthlyPlanAPI, reportAPI } from '../services/api';
+import { monthlyPlanAPI, reportAPI, annualPlanAPI } from '../services/api';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { Calendar, TrendingUp, Users, Sparkles, Target, Edit, RefreshCw, BarChart3, Download, Award, FileText } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -10,6 +11,7 @@ import { exportToPDF, exportToExcel, exportToWord } from '../utils/exportReports
 
 function MainBranchDashboard({ user, onLogout }) {
   const { t, language } = useLanguage();
+  const navigate = useNavigate();
   const [currentPlan, setCurrentPlan] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,10 +22,13 @@ function MainBranchDashboard({ user, onLogout }) {
   const [loadingReports, setLoadingReports] = useState(false);
   const [selectedBranches, setSelectedBranches] = useState([]);
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [annualPlans, setAnnualPlans] = useState([]);
+  const [selectedPlanId, setSelectedPlanId] = useState('');
 
   useEffect(() => {
     fetchCurrentPlan();
     fetchAllReports();
+    fetchAnnualPlans();
   }, []);
 
   const fetchCurrentPlan = async () => {
@@ -53,6 +58,18 @@ function MainBranchDashboard({ user, onLogout }) {
       console.error('Failed to fetch all reports:', error);
     } finally {
       setLoadingReports(false);
+    }
+  };
+
+  const fetchAnnualPlans = async () => {
+    try {
+      const res = await annualPlanAPI.getAll();
+      setAnnualPlans(res.data || []);
+      if ((res.data || []).length > 0) {
+        setSelectedPlanId(res.data[0].id?.toString() || '');
+      }
+    } catch (error) {
+      console.error('Failed to fetch annual plans:', error);
     }
   };
 
@@ -183,6 +200,26 @@ function MainBranchDashboard({ user, onLogout }) {
               <Edit size={20} />
               <span className="font-semibold">{t('ዒላማ አዘምን', 'Update Target')}</span>
             </button>
+            {user.role === 'main_branch' && (
+              <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-xl px-3 py-2">
+                <select
+                  value={selectedPlanId}
+                  onChange={(e) => setSelectedPlanId(e.target.value)}
+                  className="bg-transparent text-white text-sm"
+                >
+                  {annualPlans.map(p => (
+                    <option key={p.id} value={p.id} className="bg-slate-800">{p.title} ({p.year})</option>
+                  ))}
+                </select>
+                <button
+                  onClick={() => selectedPlanId && navigate(`/create-actions/${selectedPlanId}`)}
+                  className="flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white px-4 py-2 rounded-lg transition text-sm font-semibold"
+                >
+                  <Target size={16} />
+                  {t('ተግባሮች ጨምር', 'Add Activities')}
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
