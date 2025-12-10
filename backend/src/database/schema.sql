@@ -46,6 +46,20 @@ CREATE TABLE IF NOT EXISTS monthly_periods (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Monthly Plans Table (auto-renew system)
+CREATE TABLE IF NOT EXISTS monthly_plans (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    month INTEGER NOT NULL CHECK (month BETWEEN 1 AND 12),
+    year INTEGER NOT NULL,
+    target_amount DECIMAL(15, 2) DEFAULT 0,
+    deadline DATE NOT NULL,
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'archived')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Monthly Reports Table
 CREATE TABLE IF NOT EXISTS monthly_reports (
     id SERIAL PRIMARY KEY,
@@ -60,6 +74,10 @@ CREATE TABLE IF NOT EXISTS monthly_reports (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Link monthly reports to monthly plans (new system)
+ALTER TABLE IF EXISTS monthly_reports
+  ADD COLUMN IF NOT EXISTS monthly_plan_id INTEGER REFERENCES monthly_plans(id) ON DELETE CASCADE;
 
 -- Action Reports Table (Branch users report on specific actions)
 CREATE TABLE IF NOT EXISTS action_reports (
@@ -102,9 +120,11 @@ CREATE TABLE IF NOT EXISTS annual_aggregations (
 CREATE INDEX IF NOT EXISTS idx_monthly_periods_plan ON monthly_periods(annual_plan_id);
 CREATE INDEX IF NOT EXISTS idx_monthly_reports_period ON monthly_reports(monthly_period_id);
 CREATE INDEX IF NOT EXISTS idx_monthly_reports_user ON monthly_reports(branch_user_id);
+CREATE INDEX IF NOT EXISTS idx_monthly_reports_plan ON monthly_reports(monthly_plan_id);
 CREATE INDEX IF NOT EXISTS idx_quarterly_agg_plan ON quarterly_aggregations(annual_plan_id);
 CREATE INDEX IF NOT EXISTS idx_annual_agg_plan ON annual_aggregations(annual_plan_id);
 CREATE INDEX IF NOT EXISTS idx_actions_plan ON actions(annual_plan_id);
 CREATE INDEX IF NOT EXISTS idx_action_reports_action ON action_reports(action_id);
 CREATE INDEX IF NOT EXISTS idx_action_reports_period ON action_reports(monthly_period_id);
 CREATE INDEX IF NOT EXISTS idx_action_reports_user ON action_reports(branch_user_id);
+CREATE INDEX IF NOT EXISTS idx_monthly_plans_month_year_status ON monthly_plans(month, year, status);

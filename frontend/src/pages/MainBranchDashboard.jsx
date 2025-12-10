@@ -47,11 +47,8 @@ function MainBranchDashboard({ user, onLogout }) {
   const fetchAllReports = async () => {
     setLoadingReports(true);
     try {
-      // Get all reports for current month (month 6) from all branches
       const response = await reportAPI.getAllCurrentMonthReports();
-      // Filter to show only month 6 reports
-      const month6Reports = response.data.filter(report => report.month === 6);
-      setAllReports(month6Reports);
+      setAllReports(response.data);
     } catch (error) {
       console.error('Failed to fetch all reports:', error);
     } finally {
@@ -389,10 +386,10 @@ function MainBranchDashboard({ user, onLogout }) {
                   <div>
                     <h3 className="text-lg font-semibold text-white mb-4">{t('የቅርንጫፍ ደረጃዎች', 'Branch Grades')}</h3>
                     <div className="space-y-2 max-h-[250px] overflow-y-auto">
-                      {chartData.map((branch) => {
+                      {chartData.map((branch, index) => {
                         const gradeInfo = calculateGrade(branch.progress);
                         return (
-                          <div key={branch.name} className={`${gradeInfo.bgColor} border ${gradeInfo.borderColor} rounded-lg p-3 flex items-center justify-between`}>
+                          <div key={`${branch.name}-${index}`} className={`${gradeInfo.bgColor} border ${gradeInfo.borderColor} rounded-lg p-3 flex items-center justify-between`}>
                             <div className="flex items-center gap-3">
                               <div className={`w-12 h-12 ${gradeInfo.bgColor} border-2 ${gradeInfo.borderColor} rounded-lg flex items-center justify-center`}>
                                 <span className={`text-xl font-bold ${gradeInfo.color}`}>{gradeInfo.grade}</span>
@@ -420,7 +417,7 @@ function MainBranchDashboard({ user, onLogout }) {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {chartData.slice(0, 3).map((branch, index) => (
-                      <div key={branch.name} className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
+                      <div key={`${branch.name}-${index}`} className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
                         <div className="flex items-center gap-2 mb-2">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
                             index === 0 ? 'bg-yellow-500 text-yellow-900' :
