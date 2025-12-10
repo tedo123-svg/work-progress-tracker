@@ -133,6 +133,15 @@ export const getBranchComparison = async (req, res) => {
 // Get all branch reports for current monthly plan (for main branch dashboard)
 export const getAllCurrentMonthReports = async (req, res) => {
   try {
+    // Restrict strictly to current Ethiopian month/year to avoid older active plans
+    const now = new Date();
+    const gregorianMonth = now.getMonth() + 1;
+    const gregorianYear = now.getFullYear();
+    const currentMonth = (
+      {7:1,8:2,9:3,10:4,11:5,12:6,1:7,2:8,3:9,4:10,5:11,6:12}[gregorianMonth] || 1
+    );
+    const currentYear = gregorianMonth >= 9 ? gregorianYear - 7 : gregorianYear - 8;
+
     const result = await pool.query(
       `SELECT mr.*, mp.month, mp.year, mp.target_amount, mp.deadline,
               u.username, u.branch_name, mp.title as plan_title,
@@ -140,9 +149,9 @@ export const getAllCurrentMonthReports = async (req, res) => {
        FROM monthly_reports mr
        JOIN monthly_plans mp ON mr.monthly_plan_id = mp.id
        JOIN users u ON mr.branch_user_id = u.id
-       WHERE mp.status = 'active'
+       WHERE mp.status = 'active' AND mp.month = $1 AND mp.year = $2
        ORDER BY u.branch_name, mr.status`,
-      []
+      [currentMonth, currentYear]
     );
     
     res.json(result.rows);

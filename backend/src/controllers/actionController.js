@@ -22,14 +22,25 @@ export const createActions = async (req, res) => {
     const createdActions = [];
     
     // Create each action
-    for (const action of actions) {
-      const result = await client.query(
-        `INSERT INTO actions (annual_plan_id, action_number, action_title, plan_number, plan_activity)
-         VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-        [annualPlanId, action.actionNumber, action.actionTitle, action.planNumber, action.planActivity]
-      );
-      
-      createdActions.push(result.rows[0]);
+  for (const action of actions) {
+    const result = await client.query(
+      `INSERT INTO actions (annual_plan_id, action_number, action_title, plan_number, plan_activity)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [annualPlanId, action.actionNumber, action.actionTitle, action.planNumber, action.planActivity]
+    );
+    
+    createdActions.push(result.rows[0]);
+
+    // Optional: create link attachments associated with this action
+    if (Array.isArray(action.attachments)) {
+      for (const att of action.attachments) {
+        await client.query(
+          `INSERT INTO attachments (entity_type, entity_id, title, url, mime_type, uploaded_by)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+          ['action', result.rows[0].id, att.title, att.url, att.mimeType || null, req.user.id]
+        );
+      }
+    }
       
       // Create action reports for all branch users for all monthly periods
       const monthlyPeriods = await client.query(

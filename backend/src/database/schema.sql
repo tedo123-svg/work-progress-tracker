@@ -128,3 +128,17 @@ CREATE INDEX IF NOT EXISTS idx_action_reports_action ON action_reports(action_id
 CREATE INDEX IF NOT EXISTS idx_action_reports_period ON action_reports(monthly_period_id);
 CREATE INDEX IF NOT EXISTS idx_action_reports_user ON action_reports(branch_user_id);
 CREATE INDEX IF NOT EXISTS idx_monthly_plans_month_year_status ON monthly_plans(month, year, status);
+
+-- Attachments Table: links/documents associated with actions and reports
+CREATE TABLE IF NOT EXISTS attachments (
+    id SERIAL PRIMARY KEY,
+    entity_type VARCHAR(30) NOT NULL CHECK (entity_type IN ('action','monthly_report','action_report')),
+    entity_id INTEGER NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    url TEXT NOT NULL,
+    mime_type VARCHAR(100),
+    uploaded_by INTEGER REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_attachments_entity ON attachments(entity_type, entity_id);

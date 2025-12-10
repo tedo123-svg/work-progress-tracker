@@ -8,7 +8,7 @@ function CreateActions({ user, onLogout }) {
   const navigate = useNavigate();
   const { planId } = useParams();
   const [actions, setActions] = useState([
-    { actionNumber: 1, actionTitle: '', planNumber: '', planActivity: '' }
+    { actionNumber: 1, actionTitle: '', planNumber: '', planActivity: '', attachments: [] }
   ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -16,7 +16,7 @@ function CreateActions({ user, onLogout }) {
   const addAction = () => {
     setActions([
       ...actions,
-      { actionNumber: actions.length + 1, actionTitle: '', planNumber: '', planActivity: '' }
+      { actionNumber: actions.length + 1, actionTitle: '', planNumber: '', planActivity: '', attachments: [] }
     ]);
   };
 
@@ -37,6 +37,24 @@ function CreateActions({ user, onLogout }) {
     setActions(newActions);
   };
 
+  const addAttachment = (index) => {
+    const newActions = [...actions];
+    newActions[index].attachments.push({ title: '', url: '' });
+    setActions(newActions);
+  };
+
+  const updateAttachment = (actionIndex, attachmentIndex, field, value) => {
+    const newActions = [...actions];
+    newActions[actionIndex].attachments[attachmentIndex][field] = value;
+    setActions(newActions);
+  };
+
+  const removeAttachment = (actionIndex, attachmentIndex) => {
+    const newActions = [...actions];
+    newActions[actionIndex].attachments.splice(attachmentIndex, 1);
+    setActions(newActions);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -49,7 +67,8 @@ function CreateActions({ user, onLogout }) {
           actionNumber: a.actionNumber,
           actionTitle: a.actionTitle,
           planNumber: parseInt(a.planNumber),
-          planActivity: parseInt(a.planActivity)
+          planActivity: parseInt(a.planActivity),
+          attachments: (a.attachments || []).filter(att => att.title && att.url)
         }))
       });
       navigate(`/plan/${planId}`);
@@ -111,6 +130,45 @@ function CreateActions({ user, onLogout }) {
                       <Trash2 size={20} />
                     </button>
                   )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-purple-200 mb-2">
+                    Attach Links (optional)
+                  </label>
+                  {(action.attachments || []).map((att, aIdx) => (
+                    <div key={aIdx} className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                      <input
+                        type="text"
+                        value={att.title}
+                        onChange={(e) => updateAttachment(index, aIdx, 'title', e.target.value)}
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm"
+                        placeholder="Title (e.g., Plan Document)"
+                      />
+                      <input
+                        type="url"
+                        value={att.url}
+                        onChange={(e) => updateAttachment(index, aIdx, 'url', e.target.value)}
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm"
+                        placeholder="https://..."
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeAttachment(index, aIdx)}
+                        className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl hover:bg-white/20 transition text-white font-semibold"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => addAttachment(index)}
+                    className="inline-flex items-center space-x-2 bg-white/10 border border-white/20 hover:bg-white/20 text-white px-4 py-2 rounded-xl transition"
+                  >
+                    <Plus size={16} />
+                    <span>Add Link</span>
+                  </button>
                 </div>
 
                 <div>

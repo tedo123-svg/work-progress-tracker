@@ -6,6 +6,7 @@ import annualPlanRoutes from './routes/annualPlanRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import actionRoutes from './routes/actionRoutes.js';
 import monthlyPlanRoutes from './routes/monthlyPlanRoutes.js';
+import attachmentRoutes from './routes/attachmentRoutes.js';
 import { autoCreateMonthlyPlan, checkAndRenewMonthlyPlan } from './controllers/monthlyPlanController.js';
 
 dotenv.config();
@@ -28,6 +29,7 @@ app.use('/api/annual-plans', annualPlanRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/actions', actionRoutes);
 app.use('/api/monthly-plans', monthlyPlanRoutes);
+app.use('/api/attachments', attachmentRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

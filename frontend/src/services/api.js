@@ -52,4 +52,14 @@ export const monthlyPlanAPI = {
   checkRenewal: () => api.post('/monthly-plans/check-renewal'),
 };
 
+export const attachmentsAPI = {
+  addActionAttachment: (actionId, { title, url, mimeType }) =>
+    api.post(`/attachments/action/${actionId}`, { title, url, mimeType }),
+  addActionReportAttachment: (reportId, { title, url, mimeType }) =>
+    api.post(`/attachments/action-report/${reportId}`, { title, url, mimeType }),
+  addMonthlyReportAttachment: (reportId, { title, url, mimeType }) =>
+    api.post(`/attachments/monthly-report/${reportId}`, { title, url, mimeType }),
+  list: (entityType, entityId) => api.get(`/attachments/${entityType}/${entityId}`)
+};
+
 export default api;

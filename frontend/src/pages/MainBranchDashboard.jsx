@@ -445,7 +445,7 @@ function MainBranchDashboard({ user, onLogout }) {
                 <div>
                   <h2 className="text-xl font-bold text-white flex items-center gap-2">
                     <Users size={24} />
-                    {t('የሁሉም ቅርንጫፎች ሪፖርቶች - ወር 6', 'All Branch Reports - Month 6')}
+                    {t('የሁሉም ቅርንጫፎች ሪፖርቶች - አሁን', 'All Branch Reports - Current Month')}
                   </h2>
                   {selectedBranches.length > 0 && (
                     <p className="text-sm text-purple-300 mt-1">
