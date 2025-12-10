@@ -66,8 +66,8 @@ function CreateActions({ user, onLogout }) {
         actions: actions.map(a => ({
           actionNumber: a.actionNumber,
           actionTitle: a.actionTitle,
-          planNumber: parseInt(a.planNumber),
-          planActivity: parseInt(a.planActivity),
+          planNumber: parseInt((a.planNumber ?? '').toString().replace(/,/g, '')),
+          planActivity: parseInt((a.planActivity ?? '').toString().replace(/,/g, '')),
           attachments: (a.attachments || []).filter(att => att.title && att.url)
         }))
       });

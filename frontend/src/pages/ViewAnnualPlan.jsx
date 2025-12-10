@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { annualPlanAPI } from '../services/api';
+import { annualPlanAPI, actionAPI, attachmentsAPI } from '../services/api';
 import Navbar from '../components/Navbar';
 import { ArrowLeft, TrendingUp, Target, Plus } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
@@ -10,9 +10,12 @@ function ViewAnnualPlan({ user, onLogout }) {
   const { id } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [actions, setActions] = useState([]);
+  const [attachments, setAttachments] = useState({});
 
   useEffect(() => {
     fetchPlanDetails();
+    fetchActions();
   }, [id]);
 
   const fetchPlanDetails = async () => {
@@ -23,6 +26,24 @@ function ViewAnnualPlan({ user, onLogout }) {
       console.error('Failed to fetch plan details:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchActions = async () => {
+    try {
+      const res = await actionAPI.getByPlan(id);
+      setActions(res.data || []);
+      // Load attachments per action (optional)
+      const map = {};
+      for (const a of res.data || []) {
+        try {
+          const attRes = await attachmentsAPI.list('action', a.id);
+          map[a.id] = attRes.data || [];
+        } catch {}
+      }
+      setAttachments(map);
+    } catch (error) {
+      console.error('Failed to fetch actions:', error);
     }
   };
 
@@ -162,6 +183,47 @@ function ViewAnnualPlan({ user, onLogout }) {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {new Date(period.deadline).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Actions Created for this Plan */}
+        <div className="bg-white rounded-lg shadow overflow-hidden mt-6">
+          <div className="px-6 py-4 border-b">
+            <h2 className="text-xl font-bold">Actions</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plan #</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plan Activity</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Attachments</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {(actions || []).map(a => (
+                  <tr key={a.id}>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{a.action_number}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900 max-w-lg">{a.action_title}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{a.plan_number?.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{a.plan_activity?.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm text-blue-600">
+                      {(attachments[a.id] || []).length === 0 ? (
+                        <span className="text-gray-400">None</span>
+                      ) : (
+                        <ul className="list-disc list-inside space-y-1">
+                          {attachments[a.id].map(att => (
+                            <li key={att.id}><a href={att.url} target="_blank" rel="noreferrer" className="underline">{att.title}</a></li>
+                          ))}
+                        </ul>
+                      )}
                     </td>
                   </tr>
                 ))}
