@@ -56,13 +56,19 @@ function App() {
           path="/" 
           element={
             user ? (
-              user.role === 'admin' ? (
-                <AdminDashboard user={user} onLogout={handleLogout} />
-              ) : user.role === 'main_branch' ? (
-                <MainBranchDashboard user={user} onLogout={handleLogout} />
-              ) : (
-                <BranchUserDashboard user={user} onLogout={handleLogout} />
-              )
+              (() => {
+                console.log('🔍 User role check:', { user, role: user.role, roleType: typeof user.role });
+                if (user.role === 'admin') {
+                  console.log('✅ Showing AdminDashboard');
+                  return <AdminDashboard user={user} onLogout={handleLogout} />;
+                } else if (user.role === 'main_branch') {
+                  console.log('✅ Showing MainBranchDashboard');
+                  return <MainBranchDashboard user={user} onLogout={handleLogout} />;
+                } else {
+                  console.log('✅ Showing BranchUserDashboard');
+                  return <BranchUserDashboard user={user} onLogout={handleLogout} />;
+                }
+              })()
             ) : (
               <Navigate to="/login" />
             )
