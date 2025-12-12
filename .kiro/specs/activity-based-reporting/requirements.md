@@ -1,8 +1,8 @@
-# Activity-Based Reporting System Requirements
+# Enhanced Activity-Based Reporting System Requirements
 
 ## Introduction
 
-The Activity-Based Reporting System allows the main branch to define structured activities with planned targets, and enables branch users to report their achievements against these specific activities. This replaces the simple target/achievement model with a detailed activity-driven approach that provides better tracking and more structured reporting.
+This specification enhances the existing Action-Based Reporting System to match the structured format shown in the reference document. The system already allows main branch to create actions and branches to report achievements, but needs improvements in export formatting and activity structure to match the professional layout requirements.
 
 ## Glossary
 

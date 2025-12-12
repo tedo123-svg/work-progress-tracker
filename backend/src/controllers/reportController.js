@@ -142,6 +142,14 @@ export const getAllCurrentMonthReports = async (req, res) => {
     );
     const currentYear = gregorianMonth >= 9 ? gregorianYear - 7 : gregorianYear - 8;
 
+    console.log('=== CURRENT MONTH REPORTS DEBUG ===');
+    console.log('Current Date:', now);
+    console.log('Gregorian Month:', gregorianMonth);
+    console.log('Gregorian Year:', gregorianYear);
+    console.log('Ethiopian Month (calculated):', currentMonth);
+    console.log('Ethiopian Year (calculated):', currentYear);
+    console.log('=== END DEBUG ===');
+    
     const result = await pool.query(
       `SELECT mr.*, mp.month, mp.year, mp.target_amount, mp.deadline,
               u.username, u.branch_name, mp.title as plan_title,
@@ -149,10 +157,15 @@ export const getAllCurrentMonthReports = async (req, res) => {
        FROM monthly_reports mr
        JOIN monthly_plans mp ON mr.monthly_plan_id = mp.id
        JOIN users u ON mr.branch_user_id = u.id
-       WHERE mp.status = 'active' AND mp.month = $1 AND mp.year = $2
+       WHERE mp.month = $1 AND mp.year = $2
        ORDER BY u.branch_name, mr.status`,
       [currentMonth, currentYear]
     );
+    
+    console.log('=== QUERY RESULTS ===');
+    console.log('Total reports found:', result.rows.length);
+    console.log('Sample report months:', result.rows.slice(0, 3).map(r => ({ month: r.month, year: r.year, branch: r.branch_name })));
+    console.log('=== END RESULTS ===');
     
     res.json(result.rows);
   } catch (error) {

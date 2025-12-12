@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { Calendar, TrendingUp, Users, Sparkles, Target, Edit, RefreshCw, BarChart3, Download, Award, FileText } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { getEthiopianMonthName, formatEthiopianDeadline, getDaysUntilDeadline } from '../utils/ethiopianCalendar';
+import { getEthiopianMonthName, formatEthiopianDeadline, getDaysUntilDeadline, getCurrentEthiopianDate } from '../utils/ethiopianCalendar';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { calculateGrade, getGradeDescription } from '../utils/grading';
 import { exportToPDF, exportToExcel, exportToWord } from '../utils/exportReports';
@@ -52,7 +52,17 @@ function MainBranchDashboard({ user, onLogout }) {
   const fetchAllReports = async () => {
     setLoadingReports(true);
     try {
+      console.log('=== FRONTEND: Fetching current month reports ===');
       const response = await reportAPI.getAllCurrentMonthReports();
+      console.log('=== FRONTEND: Response received ===');
+      console.log('Total reports received:', response.data.length);
+      console.log('Sample reports:', response.data.slice(0, 3).map(r => ({ 
+        month: r.month, 
+        year: r.year, 
+        branch: r.branch_name,
+        submitted: r.submitted_at 
+      })));
+      console.log('=== END FRONTEND DEBUG ===');
       setAllReports(response.data);
     } catch (error) {
       console.error('Failed to fetch all reports:', error);
@@ -476,14 +486,17 @@ function MainBranchDashboard({ user, onLogout }) {
               </div>
             )}
 
-            {/* All Branch Reports - Month 6 Only */}
+            {/* All Branch Reports - Current Month Only */}
             <div className="glass rounded-2xl shadow-xl backdrop-blur-xl border border-white/20">
               <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-bold text-white flex items-center gap-2">
                     <Users size={24} />
-                    {t('የሁሉም ቅርንጫፎች ሪፖርቶች - አሁን', 'All Branch Reports - Current Month')}
+                    {t('የሁሉም ቅርንጫፎች ሪፖርቶች - አሁኑ ወር', 'All Branch Reports - Current Month')}
                   </h2>
+                  <p className="text-sm text-purple-300 mt-1">
+                    {t('የአሁኑ ወር ሪፖርቶች ብቻ', 'Current month reports only')}
+                  </p>
                   {selectedBranches.length > 0 && (
                     <p className="text-sm text-purple-300 mt-1">
                       {selectedBranches.length} {t('ቅርንጫፎች ተመርጠዋል', 'branches selected')}
@@ -514,7 +527,13 @@ function MainBranchDashboard({ user, onLogout }) {
                 </div>
               ) : allReports.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-purple-200">{t('ምንም ሪፖርቶች የሉም', 'No reports available')}</p>
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <Calendar size={32} className="text-white" />
+                  </div>
+                  <p className="text-white font-semibold mb-2">{t('የአሁኑ ወር ሪፖርቶች የሉም', 'No Current Month Reports')}</p>
+                  <p className="text-purple-200 text-sm">
+                    {t('የአሁኑ ወር ሪፖርቶች አልተገኙም', 'No current month reports found')}
+                  </p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">

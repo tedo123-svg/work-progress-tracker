@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { actionAPI } from '../services/api';
 import Navbar from '../components/Navbar';
-import { FileText, Clock, CheckCircle, AlertCircle, Target, TrendingUp, Link as LinkIcon, X } from 'lucide-react';
+import { FileText, Clock, CheckCircle, AlertCircle, Target, TrendingUp, Link as LinkIcon, X, Download, ChevronDown } from 'lucide-react';
 import { attachmentsAPI } from '../services/api';
 import { useLanguage } from '../contexts/LanguageContext';
-import { getEthiopianMonthName, formatEthiopianDeadline } from '../utils/ethiopianCalendar';
+import { getEthiopianMonthName, formatEthiopianDeadline, getCurrentEthiopianDate } from '../utils/ethiopianCalendar';
+import { exportActionReportsToPDF, exportActionReportsToExcel, exportActionReportsToWord } from '../utils/exportReports';
 
 function ActionReports({ user, onLogout }) {
   const { language, t } = useLanguage();
@@ -13,9 +14,16 @@ function ActionReports({ user, onLogout }) {
   const [loading, setLoading] = useState(true);
   const [attaching, setAttaching] = useState(false);
   const [attachmentModal, setAttachmentModal] = useState({ open: false, report: null, title: '', url: '' });
+  const [showExportDropdown, setShowExportDropdown] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(null);
 
   useEffect(() => {
     fetchReports();
+    // Set current Ethiopian month and year for export
+    const currentDate = getCurrentEthiopianDate();
+    setSelectedMonth(currentDate.month);
+    setSelectedYear(currentDate.year);
   }, []);
 
   const fetchReports = async () => {
@@ -51,6 +59,47 @@ function ActionReports({ user, onLogout }) {
     }
   };
 
+  const handleExport = (format) => {
+    try {
+      if (reports.length === 0) {
+        alert(t('ምንም ሪፖርቶች የሉም', 'No reports to export'));
+        return;
+      }
+
+      const month = selectedMonth || getCurrentEthiopianDate().month;
+      const year = selectedYear || getCurrentEthiopianDate().year;
+
+      switch (format) {
+        case 'pdf':
+          exportActionReportsToPDF(reports, month, year, language);
+          break;
+        case 'excel':
+          exportActionReportsToExcel(reports, month, year, language);
+          break;
+        case 'word':
+          exportActionReportsToWord(reports, month, year, language);
+          break;
+        default:
+          console.error('Unknown export format:', format);
+      }
+      setShowExportDropdown(false);
+    } catch (error) {
+      console.error('Export error:', error);
+      alert(t('ወደ ውጭ መላክ አልተሳካም', 'Export failed'));
+    }
+  };
+
+  // Get unique months and years from reports for filtering
+  const availablePeriods = [...new Set(reports.map(r => `${r.month}-${r.year}`))].map(period => {
+    const [month, year] = period.split('-');
+    return { month: parseInt(month), year: parseInt(year) };
+  });
+
+  // Filter reports by selected period
+  const filteredReports = selectedMonth && selectedYear 
+    ? reports.filter(r => r.month === selectedMonth && r.year === selectedYear)
+    : reports;
+
   const getStatusBadge = (status) => {
     const styles = {
       pending: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
@@ -77,10 +126,10 @@ function ActionReports({ user, onLogout }) {
   };
 
   const stats = {
-    total: reports.length,
-    pending: reports.filter(r => r.status === 'pending').length,
-    submitted: reports.filter(r => r.status === 'submitted').length,
-    late: reports.filter(r => r.status === 'late').length,
+    total: filteredReports.length,
+    pending: filteredReports.filter(r => r.status === 'pending').length,
+    submitted: filteredReports.filter(r => r.status === 'submitted').length,
+    late: filteredReports.filter(r => r.status === 'late').length,
   };
 
   return (
@@ -89,11 +138,79 @@ function ActionReports({ user, onLogout }) {
       
       <div className="container mx-auto px-6 py-8">
       <div className="mb-8 animate-slide-in">
-        <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
-          <Target className="text-yellow-400" size={32} />
-          {t('የተግባር ሪፖርቶች', 'Action Reports')}
-        </h1>
-        <p className="text-purple-200">{t('የወርሃዊ የተግባር ትግበራ ሪፖርቶችዎን ያስገቡ', 'Submit your monthly action implementation reports')}</p>
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
+              <Target className="text-yellow-400" size={32} />
+              {t('የተግባር ሪፖርቶች', 'Action Reports')}
+            </h1>
+            <p className="text-purple-200">{t('የወርሃዊ የተግባር ትግበራ ሪፖርቶችዎን ያስገቡ', 'Submit your monthly action implementation reports')}</p>
+          </div>
+          
+          {/* Export Controls */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            {/* Period Selector */}
+            <div className="flex gap-2">
+              <select
+                value={selectedMonth || ''}
+                onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                className="px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm"
+              >
+                <option value="">{t('ሁሉም ወሮች', 'All Months')}</option>
+                {availablePeriods.map(period => (
+                  <option key={`${period.month}-${period.year}`} value={period.month} className="bg-slate-800">
+                    {getEthiopianMonthName(period.month, language === 'am' ? 'amharic' : 'english')} {period.year}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Export Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowExportDropdown(!showExportDropdown)}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-lg transition transform hover:scale-105 shadow-lg z-50"
+                disabled={reports.length === 0}
+              >
+                <Download size={16} />
+                <span>{t('ወደ ውጭ ላክ', 'Export')}</span>
+                <ChevronDown size={16} className={`transition-transform ${showExportDropdown ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {showExportDropdown && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setShowExportDropdown(false)}
+                  />
+                  <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-white/20 rounded-lg shadow-2xl backdrop-blur-xl z-50">
+                    <button
+                      onClick={() => handleExport('pdf')}
+                      className="w-full px-4 py-3 text-left text-white hover:bg-white/10 transition flex items-center gap-2 rounded-t-lg"
+                    >
+                      <FileText size={16} />
+                      <span>{t('PDF ወደ ውጭ ላክ', 'Export as PDF')}</span>
+                    </button>
+                    <button
+                      onClick={() => handleExport('excel')}
+                      className="w-full px-4 py-3 text-left text-white hover:bg-white/10 transition flex items-center gap-2"
+                    >
+                      <FileText size={16} />
+                      <span>{t('Excel ወደ ውጭ ላክ', 'Export as Excel')}</span>
+                    </button>
+                    <button
+                      onClick={() => handleExport('word')}
+                      className="w-full px-4 py-3 text-left text-white hover:bg-white/10 transition flex items-center gap-2 rounded-b-lg"
+                    >
+                      <FileText size={16} />
+                      <span>{t('Word ወደ ውጭ ላክ', 'Export as Word')}</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -147,14 +264,17 @@ function ActionReports({ user, onLogout }) {
             <div className="inline-block w-16 h-16 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
             <p className="text-purple-200 mt-4">{t('የተግባር ሪፖርቶች በመጫን ላይ...', 'Loading action reports...')}</p>
           </div>
-        ) : reports.length === 0 ? (
+        ) : filteredReports.length === 0 ? (
           <div className="glass rounded-3xl shadow-2xl p-16 text-center backdrop-blur-xl border border-white/20 animate-fade-in">
             <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
               <Target size={48} className="text-white" />
             </div>
             <h3 className="text-2xl font-bold text-white mb-3">{t('ምንም የተግባር ሪፖርቶች የሉም', 'No Action Reports Available')}</h3>
             <p className="text-purple-200 max-w-md mx-auto">
-              {t('የተግባር ሪፖርቶች የሚታዩት በዋና ቅርንጫፍ ተግባራት ከተፈጠሩ በኋላ ነው', 'Action reports will appear once the main branch creates actions for annual plans')}
+              {reports.length === 0 
+                ? t('የተግባር ሪፖርቶች የሚታዩት በዋና ቅርንጫፍ ተግባራት ከተፈጠሩ በኋላ ነው', 'Action reports will appear once the main branch creates actions for annual plans')
+                : t('በተመረጠው ወር ምንም ሪፖርቶች የሉም', 'No reports found for the selected period')
+              }
             </p>
           </div>
         ) : (
@@ -175,7 +295,7 @@ function ActionReports({ user, onLogout }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10">
-                  {reports.map((report) => (
+                  {filteredReports.map((report) => (
                     <tr key={report.id} className="hover:bg-white/5 transition">
                       <td className="px-6 py-4 text-sm text-white max-w-xs">
                         <div className="font-medium mb-1">{t('ተግባር', 'Action')} {report.action_number}</div>

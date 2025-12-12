@@ -1,11 +1,11 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, BorderStyle } from 'docx';
+import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType } from 'docx';
 import { saveAs } from 'file-saver';
 import { calculateGrade } from './grading';
 import { getEthiopianMonthName } from './ethiopianCalendar';
-import { addGeezFontSupport, canRenderAmharic, getDisplayText } from './geezFont';
+import { addGeezFontSupport, getDisplayText } from './geezFont';
 
 // Export to PDF with Geez font support
 export const exportToPDF = (reports, month, year, language = 'en') => {
@@ -286,7 +286,7 @@ export const exportToPDF = (reports, month, year, language = 'en') => {
 export const exportToExcel = (reports, month, year, language = 'en') => {
   try {
     console.log('Exporting to Excel:', { reports, month, year, language });
-    const monthName = getEthiopianMonthName(month, language === 'am' ? 'amharic' : 'english');
+    const excelMonthName = getEthiopianMonthName(month, language === 'am' ? 'amharic' : 'english');
   
   const data = reports.map(report => {
     const gradeInfo = calculateGrade(Number(report.progress_percentage) || 0);
@@ -339,7 +339,7 @@ export const exportToExcel = (reports, month, year, language = 'en') => {
     const wsSummary = XLSX.utils.json_to_sheet(summaryData);
     XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
     
-    XLSX.writeFile(wb, `monthly-report-${monthName}-${year}.xlsx`);
+    XLSX.writeFile(wb, `monthly-report-${excelMonthName}-${year}.xlsx`);
     console.log('Excel exported successfully');
   } catch (error) {
     console.error('Error exporting Excel:', error);
@@ -351,7 +351,7 @@ export const exportToExcel = (reports, month, year, language = 'en') => {
 export const exportToWord = async (reports, month, year, language = 'en') => {
   try {
     console.log('Exporting to Word:', { reports, month, year, language });
-    const monthName = getEthiopianMonthName(month, language === 'am' ? 'amharic' : 'english');
+    const wordMonthName = getEthiopianMonthName(month, language === 'am' ? 'amharic' : 'english');
   
   const tableRows = [
     // Header row
@@ -394,7 +394,7 @@ export const exportToWord = async (reports, month, year, language = 'en') => {
           alignment: AlignmentType.CENTER
         }),
         new Paragraph({
-          text: `${language === 'am' ? 'ወር' : 'Month'}: ${monthName} ${year}`,
+          text: `${language === 'am' ? 'ወር' : 'Month'}: ${wordMonthName} ${year}`,
           spacing: { before: 200, after: 200 }
         }),
         new Paragraph({
@@ -424,10 +424,350 @@ export const exportToWord = async (reports, month, year, language = 'en') => {
   });
   
   const blob = await Packer.toBlob(doc);
-    saveAs(blob, `monthly-report-${monthName}-${year}.docx`);
+    saveAs(blob, `monthly-report-${wordMonthName}-${year}.docx`);
     console.log('Word exported successfully');
   } catch (error) {
     console.error('Error exporting Word:', error);
     alert(`Failed to export Word: ${error.message}`);
+  }
+};
+
+// ===== ACTION-BASED REPORTING EXPORTS =====
+
+// Export Action Reports to PDF with structured format
+export const exportActionReportsToPDF = (actionReports, month, year, language = 'en') => {
+  try {
+    console.log('Exporting Action Reports to PDF:', { actionReports, month, year, language });
+    const doc = new jsPDF();
+    
+    // Try to add Geez font support
+    const hasGeezFont = addGeezFontSupport(doc);
+    const useAmharic = language === 'am' && hasGeezFont;
+    
+    // Title
+    doc.setFontSize(18);
+    const title = getDisplayText('የተግባር ሪፖርት', 'Action Report', !useAmharic);
+    doc.text(title, 14, 20);
+  
+    // Month and Year
+    doc.setFontSize(12);
+    const actionMonthName = getEthiopianMonthName(month, useAmharic ? 'amharic' : 'english');
+    const monthLabel = getDisplayText('ወር', 'Month', !useAmharic);
+    const dateLabel = getDisplayText('ቀን', 'Date', !useAmharic);
+    
+    doc.text(`${monthLabel}: ${actionMonthName} ${year}`, 14, 30);
+    doc.text(`${dateLabel}: ${new Date().toLocaleDateString()}`, 14, 37);
+    
+    // Group reports by action
+    const actionGroups = {};
+    actionReports.forEach(report => {
+      const actionKey = `${report.action_number}`;
+      if (!actionGroups[actionKey]) {
+        actionGroups[actionKey] = {
+          action_number: report.action_number,
+          action_title: report.action_title,
+          plan_number: report.plan_number,
+          plan_activity: report.plan_activity,
+          reports: []
+        };
+      }
+      actionGroups[actionKey].reports.push(report);
+    });
+    
+    let currentY = 50;
+    const pageHeight = doc.internal.pageSize.height;
+    
+    // Process each action
+    Object.values(actionGroups).forEach((actionGroup, actionIndex) => {
+      // Check if we need a new page
+      if (currentY > pageHeight - 80) {
+        doc.addPage();
+        currentY = 20;
+      }
+      
+      // Action Header
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      const actionTitle = `${actionGroup.action_number}. ${actionGroup.action_title}`;
+      const splitTitle = doc.splitTextToSize(actionTitle, 180);
+      doc.text(splitTitle, 14, currentY);
+      currentY += splitTitle.length * 6 + 5;
+      
+      // Action Details
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      const planLabel = getDisplayText('የእቅድ ቁጥር', 'Plan Number', !useAmharic);
+      const targetLabel = getDisplayText('ዒላማ', 'Target', !useAmharic);
+      doc.text(`${planLabel}: ${(actionGroup.plan_number || 0).toLocaleString()}`, 14, currentY);
+      doc.text(`${targetLabel}: ${(actionGroup.plan_activity || 0).toLocaleString()}`, 100, currentY);
+      currentY += 10;
+      
+      // Table for this action
+      const tableData = actionGroup.reports.map(report => [
+        report.branch_name || '',
+        (Number(report.plan_activity) || 0).toLocaleString(),
+        (Number(report.actual_activity) || 0).toLocaleString(),
+        `${(Number(report.implementation_percentage) || 0).toFixed(1)}%`,
+        report.status === 'submitted' ? getDisplayText('ገብቷል', 'Submitted', !useAmharic) :
+        report.status === 'late' ? getDisplayText('ዘግይቷል', 'Late', !useAmharic) :
+        getDisplayText('በመጠባበቅ ላይ', 'Pending', !useAmharic)
+      ]);
+      
+      doc.autoTable({
+        startY: currentY,
+        head: [[
+          getDisplayText('ቅርንጫፍ', 'Branch', !useAmharic),
+          getDisplayText('እቅድ', 'Plan', !useAmharic),
+          getDisplayText('ተግባር', 'Achievement', !useAmharic),
+          getDisplayText('ትግበራ %', 'Implementation %', !useAmharic),
+          getDisplayText('ሁኔታ', 'Status', !useAmharic)
+        ]],
+        body: tableData,
+        theme: 'grid',
+        headStyles: { fillColor: [124, 58, 237], fontSize: 9 },
+        styles: { fontSize: 8 },
+        margin: { left: 14, right: 14 }
+      });
+      
+      currentY = doc.lastAutoTable.finalY + 15;
+      
+      // Summary for this action
+      const totalPlan = actionGroup.reports.reduce((sum, r) => sum + (Number(r.plan_activity) || 0), 0);
+      const totalAchieved = actionGroup.reports.reduce((sum, r) => sum + (Number(r.actual_activity) || 0), 0);
+      const avgImplementation = actionGroup.reports.length > 0 
+        ? actionGroup.reports.reduce((sum, r) => sum + (Number(r.implementation_percentage) || 0), 0) / actionGroup.reports.length 
+        : 0;
+      
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0);
+      const summaryLabel = getDisplayText('ማጠቃለያ', 'Summary', !useAmharic);
+      const totalPlanLabel = getDisplayText('ጠቅላላ እቅድ', 'Total Plan', !useAmharic);
+      const totalAchievedLabel = getDisplayText('ጠቅላላ ተግባር', 'Total Achievement', !useAmharic);
+      const avgLabel = getDisplayText('አማካይ ትግበራ', 'Average Implementation', !useAmharic);
+      
+      doc.text(`${summaryLabel}: ${totalPlanLabel}: ${totalPlan.toLocaleString()}, ${totalAchievedLabel}: ${totalAchieved.toLocaleString()}, ${avgLabel}: ${avgImplementation.toFixed(1)}%`, 14, currentY);
+      currentY += 15;
+    });
+    
+    // Add font notice if using English fallback
+    if (language === 'am' && !useAmharic) {
+      doc.setFontSize(8);
+      doc.setTextColor(100);
+      doc.text('Note: Amharic font not available, displaying in English', 14, currentY + 10);
+    }
+    
+    // Save
+    const monthNameForFile = getEthiopianMonthName(month, useAmharic ? 'amharic' : 'english');
+    doc.save(`action-report-${monthNameForFile}-${year}.pdf`);
+    console.log('Action Reports PDF exported successfully');
+  } catch (error) {
+    console.error('Error exporting Action Reports PDF:', error);
+    alert(`Failed to export Action Reports PDF: ${error.message}`);
+  }
+};
+
+// Export Action Reports to Excel
+export const exportActionReportsToExcel = (actionReports, month, year, language = 'en') => {
+  try {
+    console.log('Exporting Action Reports to Excel:', { actionReports, month, year, language });
+    const actionExcelMonthName = getEthiopianMonthName(month, language === 'am' ? 'amharic' : 'english');
+    
+    // Group reports by action
+    const actionGroups = {};
+    actionReports.forEach(report => {
+      const actionKey = `${report.action_number}`;
+      if (!actionGroups[actionKey]) {
+        actionGroups[actionKey] = {
+          action_number: report.action_number,
+          action_title: report.action_title,
+          plan_number: report.plan_number,
+          plan_activity: report.plan_activity,
+          reports: []
+        };
+      }
+      actionGroups[actionKey].reports.push(report);
+    });
+    
+    const wb = XLSX.utils.book_new();
+    
+    // Create detailed reports sheet
+    const detailedData = [];
+    Object.values(actionGroups).forEach(actionGroup => {
+      // Add action header row
+      detailedData.push({
+        [language === 'am' ? 'ተግባር ቁጥር' : 'Action Number']: actionGroup.action_number,
+        [language === 'am' ? 'ተግባር ርዕስ' : 'Action Title']: actionGroup.action_title,
+        [language === 'am' ? 'የእቅድ ቁጥር' : 'Plan Number']: actionGroup.plan_number,
+        [language === 'am' ? 'ዒላማ' : 'Target']: actionGroup.plan_activity,
+        [language === 'am' ? 'ቅርንጫፍ' : 'Branch']: '',
+        [language === 'am' ? 'ተግባር' : 'Achievement']: '',
+        [language === 'am' ? 'ትግበራ %' : 'Implementation %']: '',
+        [language === 'am' ? 'ሁኔታ' : 'Status']: ''
+      });
+      
+      // Add branch reports
+      actionGroup.reports.forEach(report => {
+        detailedData.push({
+          [language === 'am' ? 'ተግባር ቁጥር' : 'Action Number']: '',
+          [language === 'am' ? 'ተግባር ርዕስ' : 'Action Title']: '',
+          [language === 'am' ? 'የእቅድ ቁጥር' : 'Plan Number']: '',
+          [language === 'am' ? 'ዒላማ' : 'Target']: '',
+          [language === 'am' ? 'ቅርንጫፍ' : 'Branch']: report.branch_name || '',
+          [language === 'am' ? 'ተግባር' : 'Achievement']: Number(report.actual_activity) || 0,
+          [language === 'am' ? 'ትግበራ %' : 'Implementation %']: (Number(report.implementation_percentage) || 0).toFixed(1),
+          [language === 'am' ? 'ሁኔታ' : 'Status']: 
+            report.status === 'submitted' ? (language === 'am' ? 'ገብቷል' : 'Submitted') :
+            report.status === 'late' ? (language === 'am' ? 'ዘግይቷል' : 'Late') :
+            (language === 'am' ? 'በመጠባበቅ ላይ' : 'Pending')
+        });
+      });
+      
+      // Add empty row for separation
+      detailedData.push({});
+    });
+    
+    const wsDetailed = XLSX.utils.json_to_sheet(detailedData);
+    XLSX.utils.book_append_sheet(wb, wsDetailed, 'Detailed Reports');
+    
+    // Create summary sheet
+    const summaryData = Object.values(actionGroups).map(actionGroup => {
+      const totalPlan = actionGroup.reports.reduce((sum, r) => sum + (Number(r.plan_activity) || 0), 0);
+      const totalAchieved = actionGroup.reports.reduce((sum, r) => sum + (Number(r.actual_activity) || 0), 0);
+      const avgImplementation = actionGroup.reports.length > 0 
+        ? actionGroup.reports.reduce((sum, r) => sum + (Number(r.implementation_percentage) || 0), 0) / actionGroup.reports.length 
+        : 0;
+      
+      return {
+        [language === 'am' ? 'ተግባር ቁጥር' : 'Action Number']: actionGroup.action_number,
+        [language === 'am' ? 'ተግባር ርዕስ' : 'Action Title']: actionGroup.action_title,
+        [language === 'am' ? 'ጠቅላላ እቅድ' : 'Total Plan']: totalPlan,
+        [language === 'am' ? 'ጠቅላላ ተግባር' : 'Total Achievement']: totalAchieved,
+        [language === 'am' ? 'አማካይ ትግበራ %' : 'Average Implementation %']: avgImplementation.toFixed(1),
+        [language === 'am' ? 'የሪፖርት ቁጥር' : 'Number of Reports']: actionGroup.reports.length
+      };
+    });
+    
+    const wsSummary = XLSX.utils.json_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+    
+    XLSX.writeFile(wb, `action-report-${actionExcelMonthName}-${year}.xlsx`);
+    console.log('Action Reports Excel exported successfully');
+  } catch (error) {
+    console.error('Error exporting Action Reports Excel:', error);
+    alert(`Failed to export Action Reports Excel: ${error.message}`);
+  }
+};
+
+// Export Action Reports to Word
+export const exportActionReportsToWord = async (actionReports, month, year, language = 'en') => {
+  try {
+    console.log('Exporting Action Reports to Word:', { actionReports, month, year, language });
+    const actionWordMonthName = getEthiopianMonthName(month, language === 'am' ? 'amharic' : 'english');
+    
+    // Group reports by action
+    const actionGroups = {};
+    actionReports.forEach(report => {
+      const actionKey = `${report.action_number}`;
+      if (!actionGroups[actionKey]) {
+        actionGroups[actionKey] = {
+          action_number: report.action_number,
+          action_title: report.action_title,
+          plan_number: report.plan_number,
+          plan_activity: report.plan_activity,
+          reports: []
+        };
+      }
+      actionGroups[actionKey].reports.push(report);
+    });
+    
+    const children = [
+      new Paragraph({
+        text: language === 'am' ? 'የተግባር ሪፖርት' : 'Action Report',
+        heading: 'Heading1',
+        alignment: AlignmentType.CENTER
+      }),
+      new Paragraph({
+        text: `${language === 'am' ? 'ወር' : 'Month'}: ${actionWordMonthName} ${year}`,
+        spacing: { before: 200, after: 200 }
+      }),
+      new Paragraph({
+        text: `${language === 'am' ? 'ቀን' : 'Date'}: ${new Date().toLocaleDateString()}`,
+        spacing: { after: 400 }
+      })
+    ];
+    
+    // Add each action as a section
+    Object.values(actionGroups).forEach((actionGroup, index) => {
+      // Action title
+      children.push(new Paragraph({
+        text: `${actionGroup.action_number}. ${actionGroup.action_title}`,
+        heading: 'Heading2',
+        spacing: { before: 400, after: 200 }
+      }));
+      
+      // Action details
+      children.push(new Paragraph({
+        text: `${language === 'am' ? 'የእቅድ ቁጥር' : 'Plan Number'}: ${(actionGroup.plan_number || 0).toLocaleString()} | ${language === 'am' ? 'ዒላማ' : 'Target'}: ${(actionGroup.plan_activity || 0).toLocaleString()}`,
+        spacing: { after: 200 }
+      }));
+      
+      // Table for this action
+      const tableRows = [
+        // Header row
+        new TableRow({
+          children: [
+            new TableCell({ children: [new Paragraph({ text: language === 'am' ? 'ቅርንጫፍ' : 'Branch', bold: true })] }),
+            new TableCell({ children: [new Paragraph({ text: language === 'am' ? 'እቅድ' : 'Plan', bold: true })] }),
+            new TableCell({ children: [new Paragraph({ text: language === 'am' ? 'ተግባር' : 'Achievement', bold: true })] }),
+            new TableCell({ children: [new Paragraph({ text: language === 'am' ? 'ትግበራ %' : 'Implementation %', bold: true })] }),
+            new TableCell({ children: [new Paragraph({ text: language === 'am' ? 'ሁኔታ' : 'Status', bold: true })] })
+          ]
+        }),
+        // Data rows
+        ...actionGroup.reports.map(report => new TableRow({
+          children: [
+            new TableCell({ children: [new Paragraph(report.branch_name || '')] }),
+            new TableCell({ children: [new Paragraph((Number(report.plan_activity) || 0).toLocaleString())] }),
+            new TableCell({ children: [new Paragraph((Number(report.actual_activity) || 0).toLocaleString())] }),
+            new TableCell({ children: [new Paragraph(`${(Number(report.implementation_percentage) || 0).toFixed(1)}%`)] }),
+            new TableCell({ children: [new Paragraph(
+              report.status === 'submitted' ? (language === 'am' ? 'ገብቷል' : 'Submitted') :
+              report.status === 'late' ? (language === 'am' ? 'ዘግይቷል' : 'Late') :
+              (language === 'am' ? 'በመጠባበቅ ላይ' : 'Pending')
+            )] })
+          ]
+        }))
+      ];
+      
+      children.push(new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        rows: tableRows
+      }));
+      
+      // Summary for this action
+      const totalPlan = actionGroup.reports.reduce((sum, r) => sum + (Number(r.plan_activity) || 0), 0);
+      const totalAchieved = actionGroup.reports.reduce((sum, r) => sum + (Number(r.actual_activity) || 0), 0);
+      const avgImplementation = actionGroup.reports.length > 0 
+        ? actionGroup.reports.reduce((sum, r) => sum + (Number(r.implementation_percentage) || 0), 0) / actionGroup.reports.length 
+        : 0;
+      
+      children.push(new Paragraph({
+        text: `${language === 'am' ? 'ማጠቃለያ' : 'Summary'}: ${language === 'am' ? 'ጠቅላላ እቅድ' : 'Total Plan'}: ${totalPlan.toLocaleString()}, ${language === 'am' ? 'ጠቅላላ ተግባር' : 'Total Achievement'}: ${totalAchieved.toLocaleString()}, ${language === 'am' ? 'አማካይ ትግበራ' : 'Average Implementation'}: ${avgImplementation.toFixed(1)}%`,
+        spacing: { before: 200, after: 400 }
+      }));
+    });
+    
+    const doc = new Document({
+      sections: [{
+        children: children
+      }]
+    });
+    
+    const blob = await Packer.toBlob(doc);
+    saveAs(blob, `action-report-${actionWordMonthName}-${year}.docx`);
+    console.log('Action Reports Word exported successfully');
+  } catch (error) {
+    console.error('Error exporting Action Reports Word:', error);
+    alert(`Failed to export Action Reports Word: ${error.message}`);
   }
 };
