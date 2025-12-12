@@ -135,7 +135,6 @@ function ViewAnnualPlan({ user, onLogout }) {
       groupedActionReports[actionKey] = {
         action_number: report.action_number,
         action_title: report.action_title,
-        plan_number: report.plan_number,
         plan_activity: report.plan_activity,
         reports: []
       };
@@ -335,7 +334,6 @@ function ViewAnnualPlan({ user, onLogout }) {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('ርዕስ', 'Title')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('እቅድ #', 'Plan #')}</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('የእቅድ እንቅስቃሴ', 'Plan Activity')}</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('ድህረ ገጽ አባሪዎች', 'Attachments')}</th>
                 </tr>
@@ -345,7 +343,6 @@ function ViewAnnualPlan({ user, onLogout }) {
                   <tr key={a.id}>
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">{a.action_number}</td>
                     <td className="px-6 py-4 text-sm text-gray-900 max-w-lg">{a.action_title}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{a.plan_number?.toLocaleString()}</td>
                     <td className="px-6 py-4 text-sm text-gray-900">{a.plan_activity?.toLocaleString()}</td>
                     <td className="px-6 py-4 text-sm text-blue-600">
                       {(attachments[a.id] || []).length === 0 ? (
@@ -474,7 +471,6 @@ function ViewAnnualPlan({ user, onLogout }) {
                             {t('ተግባር', 'Action')} {actionGroup.action_number}: {actionGroup.action_title}
                           </h3>
                           <div className="flex flex-wrap gap-4 text-sm text-purple-200">
-                            <span>{t('የእቅድ ቁጥር', 'Plan Number')}: {(actionGroup.plan_number || 0).toLocaleString()}</span>
                             <span>{t('ዒላማ', 'Target')}: {(actionGroup.plan_activity || 0).toLocaleString()}</span>
                           </div>
                         </div>

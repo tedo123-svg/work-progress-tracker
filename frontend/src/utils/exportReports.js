@@ -466,7 +466,6 @@ export const exportActionReportsToPDF = (actionReports, month, year, language = 
         actionGroups[actionKey] = {
           action_number: report.action_number,
           action_title: report.action_title,
-          plan_number: report.plan_number,
           plan_activity: report.plan_activity,
           reports: []
         };
@@ -496,10 +495,8 @@ export const exportActionReportsToPDF = (actionReports, month, year, language = 
       // Action Details
       doc.setFontSize(10);
       doc.setTextColor(100, 100, 100);
-      const planLabel = getDisplayText('የእቅድ ቁጥር', 'Plan Number', !useAmharic);
       const targetLabel = getDisplayText('ዒላማ', 'Target', !useAmharic);
-      doc.text(`${planLabel}: ${(actionGroup.plan_number || 0).toLocaleString()}`, 14, currentY);
-      doc.text(`${targetLabel}: ${(actionGroup.plan_activity || 0).toLocaleString()}`, 100, currentY);
+      doc.text(`${targetLabel}: ${(actionGroup.plan_activity || 0).toLocaleString()}`, 14, currentY);
       currentY += 10;
       
       // Table for this action
@@ -580,7 +577,6 @@ export const exportActionReportsToExcel = (actionReports, month, year, language 
         actionGroups[actionKey] = {
           action_number: report.action_number,
           action_title: report.action_title,
-          plan_number: report.plan_number,
           plan_activity: report.plan_activity,
           reports: []
         };
@@ -597,7 +593,6 @@ export const exportActionReportsToExcel = (actionReports, month, year, language 
       detailedData.push({
         [language === 'am' ? 'ተግባር ቁጥር' : 'Action Number']: actionGroup.action_number,
         [language === 'am' ? 'ተግባር ርዕስ' : 'Action Title']: actionGroup.action_title,
-        [language === 'am' ? 'የእቅድ ቁጥር' : 'Plan Number']: actionGroup.plan_number,
         [language === 'am' ? 'ዒላማ' : 'Target']: actionGroup.plan_activity,
         [language === 'am' ? 'ቅርንጫፍ' : 'Branch']: '',
         [language === 'am' ? 'ተግባር' : 'Achievement']: '',
@@ -610,7 +605,6 @@ export const exportActionReportsToExcel = (actionReports, month, year, language 
         detailedData.push({
           [language === 'am' ? 'ተግባር ቁጥር' : 'Action Number']: '',
           [language === 'am' ? 'ተግባር ርዕስ' : 'Action Title']: '',
-          [language === 'am' ? 'የእቅድ ቁጥር' : 'Plan Number']: '',
           [language === 'am' ? 'ዒላማ' : 'Target']: '',
           [language === 'am' ? 'ቅርንጫፍ' : 'Branch']: report.branch_name || '',
           [language === 'am' ? 'ተግባር' : 'Achievement']: Number(report.actual_activity) || 0,
@@ -672,7 +666,6 @@ export const exportActionReportsToWord = async (actionReports, month, year, lang
         actionGroups[actionKey] = {
           action_number: report.action_number,
           action_title: report.action_title,
-          plan_number: report.plan_number,
           plan_activity: report.plan_activity,
           reports: []
         };
@@ -707,7 +700,7 @@ export const exportActionReportsToWord = async (actionReports, month, year, lang
       
       // Action details
       children.push(new Paragraph({
-        text: `${language === 'am' ? 'የእቅድ ቁጥር' : 'Plan Number'}: ${(actionGroup.plan_number || 0).toLocaleString()} | ${language === 'am' ? 'ዒላማ' : 'Target'}: ${(actionGroup.plan_activity || 0).toLocaleString()}`,
+        text: `${language === 'am' ? 'ዒላማ' : 'Target'}: ${(actionGroup.plan_activity || 0).toLocaleString()}`,
         spacing: { after: 200 }
       }));
       

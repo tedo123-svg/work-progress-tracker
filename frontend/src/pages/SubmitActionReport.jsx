@@ -129,11 +129,7 @@ function SubmitActionReport({ user, onLogout }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-4 border border-blue-400/30">
-              <div className="text-sm text-blue-300 mb-1">{t('የእቅድ ቁጥር', 'Plan Number')}</div>
-              <div className="text-2xl font-bold text-white">
-                {report.plan_number?.toLocaleString()}
-              </div>
-            </div>
+  
             
             <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-sm rounded-xl p-4 border border-green-400/30">
               <div className="text-sm text-green-300 mb-1">{t('የእቅድ እንቅስቃሴ (ዒላማ)', 'Plan Activity (Target)')}</div>

@@ -26,7 +26,7 @@ export const createActions = async (req, res) => {
     const result = await client.query(
       `INSERT INTO actions (annual_plan_id, action_number, action_title, plan_number, plan_activity)
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [annualPlanId, action.actionNumber, action.actionTitle, action.planNumber, action.planActivity]
+      [annualPlanId, action.actionNumber, action.actionTitle, action.planNumber || null, action.planActivity]
     );
     
     createdActions.push(result.rows[0]);

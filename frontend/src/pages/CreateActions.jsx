@@ -10,7 +10,7 @@ function CreateActions({ user, onLogout }) {
   const { planId } = useParams();
   const { t } = useLanguage();
   const [actions, setActions] = useState([
-    { actionNumber: 1, actionTitle: '', planNumber: '', planActivity: '', attachments: [] }
+    { actionNumber: 1, actionTitle: '', planActivity: '', attachments: [] }
   ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -18,7 +18,7 @@ function CreateActions({ user, onLogout }) {
   const addAction = () => {
     setActions([
       ...actions,
-      { actionNumber: actions.length + 1, actionTitle: '', planNumber: '', planActivity: '', attachments: [] }
+      { actionNumber: actions.length + 1, actionTitle: '', planActivity: '', attachments: [] }
     ]);
   };
 
@@ -68,7 +68,6 @@ function CreateActions({ user, onLogout }) {
         actions: actions.map(a => ({
           actionNumber: a.actionNumber,
           actionTitle: a.actionTitle,
-          planNumber: parseInt((a.planNumber ?? '').toString().replace(/,/g, '')),
           planActivity: parseInt((a.planActivity ?? '').toString().replace(/,/g, '')),
           attachments: (a.attachments || []).filter(att => att.title && att.url)
         }))
@@ -103,7 +102,7 @@ function CreateActions({ user, onLogout }) {
               {t('ተግባራት ፍጠር', 'Create Actions')}
             </h1>
             <p className="text-purple-200">
-              {t('ተግባራትን በእቅድ ቁጥሮች እና ዒላማ እንቅስቃሴዎች ይግለጹ። ቅርንጫፎች የተጠናቀቁ ትክክለኛ እንቅስቃሴዎችን ሪፖርት ያደርጋሉ።', 'Define actions with plan numbers and target activities. Branches will report actual activities completed.')}
+              {t('ተግባራትን እና ዒላማ እንቅስቃሴዎች ይግለጹ። ቅርንጫፎች የተጠናቀቁ ትክክለኛ እንቅስቃሴዎችን ሪፖርት ያደርጋሉ።', 'Define actions and target activities. Branches will report actual activities completed.')}
             </p>
           </div>
 
@@ -187,34 +186,18 @@ function CreateActions({ user, onLogout }) {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
+                <div>
                   <label className="block text-sm font-medium text-purple-200 mb-2">
-                      {t('የእቅድ ቁጥር *', 'Plan Number *')}
+                    {t('የእቅድ እንቅስቃሴ (ዒላማ) *', 'Plan Activity (Target) *')}
                   </label>
-                    <input
-                      type="number"
-                      value={action.planNumber}
-                      onChange={(e) => updateAction(index, 'planNumber', e.target.value)}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm"
-                      placeholder={t('ለምሳሌ፣ 120000', 'e.g., 120000')}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                  <label className="block text-sm font-medium text-purple-200 mb-2">
-                      {t('የእቅድ እንቅስቃሴ (ዒላማ) *', 'Plan Activity (Target) *')}
-                  </label>
-                    <input
-                      type="number"
-                      value={action.planActivity}
-                      onChange={(e) => updateAction(index, 'planActivity', e.target.value)}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm"
-                      placeholder={t('ለምሳሌ፣ 1317376', 'e.g., 1317376')}
-                      required
-                    />
-                  </div>
+                  <input
+                    type="number"
+                    value={action.planActivity}
+                    onChange={(e) => updateAction(index, 'planActivity', e.target.value)}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm"
+                    placeholder={t('ለምሳሌ፣ 1317376', 'e.g., 1317376')}
+                    required
+                  />
                 </div>
               </div>
             ))}

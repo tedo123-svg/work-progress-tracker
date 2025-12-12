@@ -285,7 +285,6 @@ function ActionReports({ user, onLogout }) {
                   <tr>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">{t('ተግባር', 'Action')}</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">{t('ጊዜ', 'Period')}</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">{t('እቅድ #', 'Plan #')}</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">{t('የእቅድ እንቅስቃሴ', 'Plan Activity')}</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">{t('ትክክለኛ', 'Actual')}</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">{t('የትግበራ መቶኛ', 'Implementation %')}</th>
@@ -304,9 +303,7 @@ function ActionReports({ user, onLogout }) {
                       <td className="px-6 py-4 text-sm text-purple-200">
                         {getEthiopianMonthName(report.month, language === 'am' ? 'amharic' : 'english')} {report.year}
                       </td>
-                      <td className="px-6 py-4 text-sm text-blue-300 font-semibold">
-                        {report.plan_number?.toLocaleString()}
-                      </td>
+
                       <td className="px-6 py-4 text-sm text-green-300 font-semibold">
                         {report.plan_activity?.toLocaleString()}
                       </td>
