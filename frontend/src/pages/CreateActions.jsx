@@ -5,6 +5,8 @@ import Navbar from '../components/Navbar';
 import { ArrowLeft, Plus, Trash2, Target } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
+// Plan number field has been removed as requested
+
 function CreateActions({ user, onLogout }) {
   const navigate = useNavigate();
   const { planId } = useParams();
