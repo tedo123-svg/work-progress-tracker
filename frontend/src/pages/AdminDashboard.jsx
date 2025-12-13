@@ -17,7 +17,8 @@ const AdminDashboard = ({ user, onLogout }) => {
     password: '',
     role: 'branch_user',
     branchName: '',
-    email: ''
+    email: '',
+    phoneNumber: ''
   });
   const [resetPassword, setResetPasswordData] = useState({
     userId: null,
@@ -59,7 +60,8 @@ const AdminDashboard = ({ user, onLogout }) => {
         password: '',
         role: 'branch_user',
         branchName: '',
-        email: ''
+        email: '',
+        phoneNumber: ''
       });
       fetchData();
     } catch (error) {
@@ -343,6 +345,16 @@ const AdminDashboard = ({ user, onLogout }) => {
                   required
                   value={newUser.email}
                   onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                <input
+                  type="tel"
+                  value={newUser.phoneNumber}
+                  onChange={(e) => setNewUser({...newUser, phoneNumber: e.target.value})}
+                  placeholder="+251911000000"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>

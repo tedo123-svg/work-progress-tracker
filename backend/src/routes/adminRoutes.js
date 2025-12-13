@@ -13,7 +13,9 @@ import {
   deleteUser,
   resetUserPassword,
   getSystemStats,
-  updateUserEmail
+  updateUserEmail,
+  updateUserPhone,
+  updateUserContact
 } from '../controllers/adminController.js';
 
 const router = express.Router();
@@ -36,6 +38,8 @@ router.put('/users/:id', updateUser);
 router.delete('/users/:id', deleteUser);
 router.post('/users/:id/reset-password', resetUserPassword);
 router.put('/users/:id/email', updateUserEmail);
+router.put('/users/:id/phone', updateUserPhone);
+router.put('/users/:id/contact', updateUserContact);
 
 // Statistics and overview
 router.get('/stats', getBranchStats);

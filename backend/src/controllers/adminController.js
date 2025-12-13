@@ -256,7 +256,7 @@ export const createUser = async (req, res) => {
   try {
     await client.query('BEGIN');
     
-    const { username, password, role, branchName, email } = req.body;
+    const { username, password, role, branchName, email, phoneNumber } = req.body;
     
     // Validate role
     if (!['admin', 'main_branch', 'branch_user'].includes(role)) {
@@ -278,9 +278,9 @@ export const createUser = async (req, res) => {
     
     // Create user
     const result = await client.query(
-      `INSERT INTO users (username, password, role, branch_name, email)
-       VALUES ($1, $2, $3, $4, $5) RETURNING id, username, role, branch_name, email, created_at`,
-      [username, hashedPassword, role, branchName || null, email]
+      `INSERT INTO users (username, password, role, branch_name, email, phone_number)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, username, role, branch_name, email, phone_number, created_at`,
+      [username, hashedPassword, role, branchName || null, email, phoneNumber || null]
     );
     
     const newUser = result.rows[0];
@@ -553,5 +553,141 @@ export const updateUserEmail = async (req, res) => {
   } catch (error) {
     console.error('Update email error:', error);
     res.status(500).json({ error: 'Failed to update email' });
+  }
+};
+// Update user phone number specifically
+export const updateUserPhone = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { phoneNumber } = req.body;
+    
+    if (!phoneNumber) {
+      return res.status(400).json({ error: 'Phone number is required' });
+    }
+    
+    // Basic phone number validation (can be enhanced)
+    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+    if (!phoneRegex.test(phoneNumber.replace(/[\s\-\(\)]/g, ''))) {
+      return res.status(400).json({ error: 'Invalid phone number format' });
+    }
+    
+    // Check if phone number already exists for another user
+    const existingPhone = await pool.query(
+      'SELECT id, username FROM users WHERE phone_number = $1 AND id != $2',
+      [phoneNumber, id]
+    );
+    
+    if (existingPhone.rows.length > 0) {
+      return res.status(400).json({ 
+        error: `Phone number already in use by user: ${existingPhone.rows[0].username}` 
+      });
+    }
+    
+    const result = await pool.query(
+      `UPDATE users SET phone_number = $1 WHERE id = $2 RETURNING id, username, email, phone_number, role, branch_name`,
+      [phoneNumber, id]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    console.log(`✅ Admin updated phone number for user ${result.rows[0].username} to ${phoneNumber}`);
+    
+    res.json({
+      message: 'Phone number updated successfully',
+      user: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Update phone number error:', error);
+    res.status(500).json({ error: 'Failed to update phone number' });
+  }
+};
+
+// Update user contact info (email and phone together)
+export const updateUserContact = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { email, phoneNumber } = req.body;
+    
+    // Validate email
+    if (email && !email.includes('@')) {
+      return res.status(400).json({ error: 'Valid email address is required' });
+    }
+    
+    // Validate phone number
+    if (phoneNumber) {
+      const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+      if (!phoneRegex.test(phoneNumber.replace(/[\s\-\(\)]/g, ''))) {
+        return res.status(400).json({ error: 'Invalid phone number format' });
+      }
+    }
+    
+    // Check for duplicate email
+    if (email) {
+      const existingEmail = await pool.query(
+        'SELECT id, username FROM users WHERE email = $1 AND id != $2',
+        [email, id]
+      );
+      
+      if (existingEmail.rows.length > 0) {
+        return res.status(400).json({ 
+          error: `Email already in use by user: ${existingEmail.rows[0].username}` 
+        });
+      }
+    }
+    
+    // Check for duplicate phone number
+    if (phoneNumber) {
+      const existingPhone = await pool.query(
+        'SELECT id, username FROM users WHERE phone_number = $1 AND id != $2',
+        [phoneNumber, id]
+      );
+      
+      if (existingPhone.rows.length > 0) {
+        return res.status(400).json({ 
+          error: `Phone number already in use by user: ${existingPhone.rows[0].username}` 
+        });
+      }
+    }
+    
+    // Build dynamic query
+    let query = 'UPDATE users SET ';
+    let params = [];
+    let updates = [];
+    
+    if (email) {
+      updates.push(`email = $${params.length + 1}`);
+      params.push(email);
+    }
+    
+    if (phoneNumber) {
+      updates.push(`phone_number = $${params.length + 1}`);
+      params.push(phoneNumber);
+    }
+    
+    if (updates.length === 0) {
+      return res.status(400).json({ error: 'No contact information provided to update' });
+    }
+    
+    query += updates.join(', ');
+    query += ` WHERE id = $${params.length + 1} RETURNING id, username, email, phone_number, role, branch_name`;
+    params.push(id);
+    
+    const result = await pool.query(query, params);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    console.log(`✅ Admin updated contact info for user ${result.rows[0].username}`);
+    
+    res.json({
+      message: 'Contact information updated successfully',
+      user: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Update contact info error:', error);
+    res.status(500).json({ error: 'Failed to update contact information' });
   }
 };
