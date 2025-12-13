@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import api, { adminAPI } from '../services/api';
 import Navbar from '../components/Navbar';
 
 const AdminDashboard = ({ user, onLogout }) => {
@@ -32,8 +32,8 @@ const AdminDashboard = ({ user, onLogout }) => {
     try {
       setLoading(true);
       const [statsResponse, usersResponse] = await Promise.all([
-        api.get('/admin/system-stats'),
-        api.get('/admin/users')
+        adminAPI.getSystemStats(),
+        adminAPI.getAllUsers()
       ]);
       
       setStats(statsResponse.data);
@@ -52,7 +52,7 @@ const AdminDashboard = ({ user, onLogout }) => {
   const handleCreateUser = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/admin/users', newUser);
+      await adminAPI.createUser(newUser);
       setShowCreateUser(false);
       setNewUser({
         username: '',
@@ -71,9 +71,7 @@ const AdminDashboard = ({ user, onLogout }) => {
   const handleResetPassword = async (e) => {
     e.preventDefault();
     try {
-      await api.post(`/admin/users/${resetPassword.userId}/reset-password`, {
-        newPassword: resetPassword.newPassword
-      });
+      await adminAPI.resetUserPassword(resetPassword.userId, resetPassword.newPassword);
       setShowResetPassword(false);
       setResetPasswordData({ userId: null, newPassword: '' });
       setSelectedUser(null);
@@ -87,7 +85,7 @@ const AdminDashboard = ({ user, onLogout }) => {
   const handleDeleteUser = async (userId, username) => {
     if (window.confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
       try {
-        await api.delete(`/admin/users/${userId}`);
+        await adminAPI.deleteUser(userId);
         fetchData();
       } catch (error) {
         console.error('Error deleting user:', error);

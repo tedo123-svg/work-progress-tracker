@@ -1,0 +1,22 @@
+# Environment Configuration for 92HOST
+# Copy this content to: public_html/api/.env
+
+NODE_ENV=production
+PORT=3000
+
+# Database Configuration (MySQL)
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=worktracker_db
+DB_USER=worktracker_user
+DB_PASSWORD=YOUR_DATABASE_PASSWORD_HERE
+
+# JWT Configuration
+JWT_SECRET=your_super_secret_jwt_key_change_this_to_something_secure
+JWT_EXPIRES_IN=7d
+
+# CORS Configuration
+FRONTEND_URL=https://yourdomain.com
+
+# Optional: Logging
+LOG_LEVEL=info

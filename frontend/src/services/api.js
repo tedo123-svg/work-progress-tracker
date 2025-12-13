@@ -62,4 +62,24 @@ export const attachmentsAPI = {
   list: (entityType, entityId) => api.get(`/attachments/${entityType}/${entityId}`)
 };
 
+export const adminAPI = {
+  // User Management
+  getAllUsers: () => api.get('/admin/users'),
+  createUser: (userData) => api.post('/admin/users', userData),
+  updateUser: (userId, userData) => api.put(`/admin/users/${userId}`, userData),
+  deleteUser: (userId) => api.delete(`/admin/users/${userId}`),
+  resetUserPassword: (userId, newPassword) => api.post(`/admin/users/${userId}/reset-password`, { newPassword }),
+  
+  // System Statistics
+  getSystemStats: () => api.get('/admin/system-stats'),
+  getBranchStats: () => api.get('/admin/stats'),
+  
+  // Legacy Branch Management (for compatibility)
+  getAllBranches: () => api.get('/admin/branches'),
+  createBranch: (branchData) => api.post('/admin/branches', branchData),
+  updateBranch: (branchId, branchData) => api.put(`/admin/branches/${branchId}`, branchData),
+  deleteBranch: (branchId) => api.delete(`/admin/branches/${branchId}`),
+  resetBranchPassword: (branchId, newPassword) => api.post(`/admin/branches/${branchId}/reset-password`, { newPassword }),
+};
+
 export default api;

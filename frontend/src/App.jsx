@@ -5,7 +5,7 @@ import Login from './pages/Login';
 import MainBranchDashboard from './pages/MainBranchDashboard';
 import BranchUserDashboard from './pages/BranchUserDashboard';
 import AdminDashboard from './pages/AdminDashboard';
-import TestAdmin from './pages/TestAdmin';
+
 import CreateAnnualPlan from './pages/CreateAnnualPlan';
 import ViewAnnualPlan from './pages/ViewAnnualPlan';
 import SubmitReport from './pages/SubmitReport';
@@ -24,14 +24,12 @@ function App() {
     
     if (token && userData) {
       const parsedUser = JSON.parse(userData);
-      console.log('🔍 Loading user from localStorage:', parsedUser);
       setUser(parsedUser);
     }
     setLoading(false);
   }, []);
 
   const handleLogin = (userData, token) => {
-    console.log('🔍 Login successful, user data:', userData);
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
@@ -60,21 +58,13 @@ function App() {
           path="/" 
           element={
             user ? (
-              (() => {
-                console.log('🔍 User role check:', { user, role: user.role, roleType: typeof user.role });
-                alert(`Debug: User role is "${user.role}" (type: ${typeof user.role})`);
-                if (user.role === 'admin') {
-                  console.log('✅ Admin detected - redirecting to /admin');
-                  alert('Admin detected! Redirecting to admin dashboard...');
-                  return <Navigate to="/test-admin" replace />;
-                } else if (user.role === 'main_branch') {
-                  console.log('✅ Showing MainBranchDashboard');
-                  return <MainBranchDashboard user={user} onLogout={handleLogout} />;
-                } else {
-                  console.log('✅ Showing BranchUserDashboard');
-                  return <BranchUserDashboard user={user} onLogout={handleLogout} />;
-                }
-              })()
+              user.role === 'admin' ? (
+                <Navigate to="/admin" replace />
+              ) : user.role === 'main_branch' ? (
+                <MainBranchDashboard user={user} onLogout={handleLogout} />
+              ) : (
+                <BranchUserDashboard user={user} onLogout={handleLogout} />
+              )
             ) : (
               <Navigate to="/login" />
             )
@@ -86,10 +76,7 @@ function App() {
           element={user?.role === 'admin' ? <AdminDashboard user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
         />
         
-        <Route 
-          path="/test-admin" 
-          element={user?.role === 'admin' ? <TestAdmin user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
-        />
+
         
         <Route 
           path="/create-plan" 
