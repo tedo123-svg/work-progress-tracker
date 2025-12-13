@@ -17,9 +17,22 @@ export const sendVerificationEmail = async (email, code, username) => {
       return { success: false, error: 'Email service not configured' };
     }
 
+    // Smart email routing for development vs production
+    let recipientEmail = email;
+    let emailNote = '';
+    
+    // If in development mode (RESEND_TEST_EMAIL is set), use test email
+    if (process.env.RESEND_TEST_EMAIL) {
+      recipientEmail = process.env.RESEND_TEST_EMAIL;
+      emailNote = `<div style="background-color: #fef3c7; border: 1px solid #f59e0b; padding: 10px; margin: 10px 0; border-radius: 6px; font-size: 12px; color: #92400e;">
+        <strong>Development Mode:</strong> This email was intended for <strong>${email}</strong> but redirected to your test email for development purposes.
+      </div>`;
+      console.log(`📧 Development mode: Redirecting email from ${email} to ${recipientEmail}`);
+    }
+
     const { data, error } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
-      to: [process.env.RESEND_TEST_EMAIL || email], // Use test email for development
+      to: [recipientEmail],
       subject: 'Work Progress Tracker - Verification Code',
       html: `
         <!DOCTYPE html>
@@ -60,6 +73,7 @@ export const sendVerificationEmail = async (email, code, username) => {
             </div>
             
             <div class="content">
+              ${emailNote}
               <h2 class="greeting">Hello ${username}!</h2>
               
               <p class="message">
@@ -140,9 +154,22 @@ export const sendPasswordResetEmail = async (email, newPassword, username) => {
       return { success: false, error: 'Email service not configured' };
     }
 
+    // Smart email routing for development vs production
+    let recipientEmail = email;
+    let emailNote = '';
+    
+    // If in development mode (RESEND_TEST_EMAIL is set), use test email
+    if (process.env.RESEND_TEST_EMAIL) {
+      recipientEmail = process.env.RESEND_TEST_EMAIL;
+      emailNote = `<div style="background-color: #fef3c7; border: 1px solid #f59e0b; padding: 10px; margin: 10px 0; border-radius: 6px; font-size: 12px; color: #92400e;">
+        <strong>Development Mode:</strong> This email was intended for <strong>${email}</strong> but redirected to your test email for development purposes.
+      </div>`;
+      console.log(`📧 Development mode: Redirecting password reset email from ${email} to ${recipientEmail}`);
+    }
+
     const { data, error } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
-      to: [process.env.RESEND_TEST_EMAIL || email], // Use test email for development
+      to: [recipientEmail],
       subject: 'Work Progress Tracker - Password Reset Notification',
       html: `
         <!DOCTYPE html>
@@ -187,6 +214,7 @@ export const sendPasswordResetEmail = async (email, newPassword, username) => {
             </div>
             
             <div class="content">
+              ${emailNote}
               <h2 class="greeting">Hello ${username}!</h2>
               
               <p class="message">
