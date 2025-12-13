@@ -21,13 +21,17 @@ export const sendVerificationEmail = async (email, code, username) => {
     let recipientEmail = email;
     let emailNote = '';
     
-    // If in development mode (RESEND_TEST_EMAIL is set), use test email
-    if (process.env.RESEND_TEST_EMAIL) {
+    // Check if we should use development mode
+    const isDevelopmentMode = process.env.RESEND_TEST_EMAIL && process.env.NODE_ENV !== 'production';
+    
+    if (isDevelopmentMode) {
       recipientEmail = process.env.RESEND_TEST_EMAIL;
       emailNote = `<div style="background-color: #fef3c7; border: 1px solid #f59e0b; padding: 10px; margin: 10px 0; border-radius: 6px; font-size: 12px; color: #92400e;">
         <strong>Development Mode:</strong> This email was intended for <strong>${email}</strong> but redirected to your test email for development purposes.
       </div>`;
       console.log(`📧 Development mode: Redirecting email from ${email} to ${recipientEmail}`);
+    } else {
+      console.log(`📧 Production mode: Sending email directly to ${email}`);
     }
 
     const { data, error } = await resend.emails.send({
@@ -158,13 +162,17 @@ export const sendPasswordResetEmail = async (email, newPassword, username) => {
     let recipientEmail = email;
     let emailNote = '';
     
-    // If in development mode (RESEND_TEST_EMAIL is set), use test email
-    if (process.env.RESEND_TEST_EMAIL) {
+    // Check if we should use development mode
+    const isDevelopmentMode = process.env.RESEND_TEST_EMAIL && process.env.NODE_ENV !== 'production';
+    
+    if (isDevelopmentMode) {
       recipientEmail = process.env.RESEND_TEST_EMAIL;
       emailNote = `<div style="background-color: #fef3c7; border: 1px solid #f59e0b; padding: 10px; margin: 10px 0; border-radius: 6px; font-size: 12px; color: #92400e;">
         <strong>Development Mode:</strong> This email was intended for <strong>${email}</strong> but redirected to your test email for development purposes.
       </div>`;
       console.log(`📧 Development mode: Redirecting password reset email from ${email} to ${recipientEmail}`);
+    } else {
+      console.log(`📧 Production mode: Sending password reset email directly to ${email}`);
     }
 
     const { data, error } = await resend.emails.send({
