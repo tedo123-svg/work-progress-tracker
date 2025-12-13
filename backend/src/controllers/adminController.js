@@ -95,7 +95,7 @@ export const updateBranch = async (req, res) => {
     const { id } = req.params;
     const { username, branchName, email, password } = req.body;
     
-    let query = `UPDATE users SET username = $1, branch_name = $2, email = $3, updated_at = NOW()`;
+    let query = `UPDATE users SET username = $1, branch_name = $2, email = $3`;
     let params = [username, branchName, email];
     
     // If password is provided, hash and update it
@@ -210,7 +210,7 @@ export const resetBranchPassword = async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     
     const result = await pool.query(
-      `UPDATE users SET password = $1, updated_at = NOW() 
+      `UPDATE users SET password = $1 
        WHERE id = $2 AND role = 'branch_user' 
        RETURNING id, username, branch_name`,
       [hashedPassword, id]
@@ -336,7 +336,7 @@ export const updateUser = async (req, res) => {
       return res.status(400).json({ error: 'Invalid role specified' });
     }
     
-    let query = `UPDATE users SET username = $1, role = $2, branch_name = $3, email = $4, updated_at = NOW()`;
+    let query = `UPDATE users SET username = $1, role = $2, branch_name = $3, email = $4`;
     let params = [username, role, branchName || null, email];
     
     // If password is provided, hash and update it
@@ -425,7 +425,7 @@ export const resetUserPassword = async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     
     const result = await pool.query(
-      `UPDATE users SET password = $1, updated_at = NOW() 
+      `UPDATE users SET password = $1 
        WHERE id = $2 
        RETURNING id, username, role, branch_name`,
       [hashedPassword, id]
