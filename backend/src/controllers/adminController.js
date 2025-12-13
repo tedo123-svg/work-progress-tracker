@@ -513,3 +513,45 @@ export const getSystemStats = async (req, res) => {
     res.status(500).json({ error: 'Failed to get system statistics' });
   }
 };
+// Update user email specifically (quick email update)
+export const updateUserEmail = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { email } = req.body;
+    
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ error: 'Valid email address is required' });
+    }
+    
+    // Check if email already exists for another user
+    const existingEmail = await pool.query(
+      'SELECT id, username FROM users WHERE email = $1 AND id != $2',
+      [email, id]
+    );
+    
+    if (existingEmail.rows.length > 0) {
+      return res.status(400).json({ 
+        error: `Email already in use by user: ${existingEmail.rows[0].username}` 
+      });
+    }
+    
+    const result = await pool.query(
+      `UPDATE users SET email = $1 WHERE id = $2 RETURNING id, username, email, role, branch_name`,
+      [email, id]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    console.log(`✅ Admin updated email for user ${result.rows[0].username} to ${email}`);
+    
+    res.json({
+      message: 'Email updated successfully',
+      user: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Update email error:', error);
+    res.status(500).json({ error: 'Failed to update email' });
+  }
+};

@@ -75,6 +75,7 @@ export const adminAPI = {
   updateUser: (userId, userData) => api.put(`/admin/users/${userId}`, userData),
   deleteUser: (userId) => api.delete(`/admin/users/${userId}`),
   resetUserPassword: (userId, newPassword) => api.post(`/admin/users/${userId}/reset-password`, { newPassword }),
+  updateUserEmail: (userId, email) => api.put(`/admin/users/${userId}/email`, { email }),
   
   // System Statistics
   getSystemStats: () => api.get('/admin/system-stats'),
