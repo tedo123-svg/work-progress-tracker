@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { monthlyPlanAPI, reportAPI } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { Calendar, TrendingUp, Users, Sparkles, RefreshCw, BarChart3, Download, Award, FileText } from 'lucide-react';
+import { Calendar, TrendingUp, Users, Sparkles, Target, RefreshCw, BarChart3, Download, Award, FileText } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getEthiopianMonthName, formatEthiopianDeadline, getDaysUntilDeadline, getCurrentEthiopianDate } from '../utils/ethiopianCalendar';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
