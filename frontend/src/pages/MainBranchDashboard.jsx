@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { monthlyPlanAPI, reportAPI, annualPlanAPI } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
@@ -48,41 +48,75 @@ function MainBranchDashboard({ user, onLogout }) {
   const fetchAllReports = async () => {
     setLoadingReports(true);
     try {
-      console.log('=== FRONTEND: Fetching Amharic activity reports (v2) ===');
+      console.log('=== FRONTEND: Fetching Amharic activity reports (v3) ===');
       const response = await annualPlanAPI.getAllAmharicActivityReports();
       console.log('=== FRONTEND: Response received ===');
+      
+      // Ensure response and response.data exist
+      if (!response || !response.data) {
+        console.warn('Invalid API response:', response);
+        setAllReports([]);
+        return;
+      }
+      
       console.log('Total activity reports received:', response.data.length);
       console.log('Raw response data:', response.data);
       
+      // Ensure response.data is an array
+      const responseData = Array.isArray(response.data) ? response.data : [];
+      
       // Validate the response data structure
-      const validatedReports = response.data.map((report, index) => {
-        if (!report) {
-          console.warn(`Report at index ${index} is null/undefined`);
+      const validatedReports = responseData.map((report, index) => {
+        if (!report || typeof report !== 'object') {
+          console.warn(`Report at index ${index} is null/undefined/invalid:`, report);
           return null;
         }
         
+        // Ensure required fields exist
+        const safeReport = {
+          branch_name: report.branch_name || `Branch ${index + 1}`,
+          username: report.username || 'Unknown User',
+          plan_title: report.plan_title || 'Unknown Plan',
+          plan_title_amharic: report.plan_title_amharic || '',
+          activities: []
+        };
+        
         if (!report.activities) {
           console.warn(`Report at index ${index} missing activities:`, report);
-          return {
-            ...report,
-            activities: []
-          };
+          return safeReport;
         }
         
         if (!Array.isArray(report.activities)) {
           console.warn(`Report at index ${index} activities is not an array:`, report.activities);
-          return {
-            ...report,
-            activities: []
-          };
+          return safeReport;
         }
         
-        return report;
+        // Validate each activity
+        safeReport.activities = report.activities.map((activity, actIndex) => {
+          if (!activity || typeof activity !== 'object') {
+            console.warn(`Activity at index ${actIndex} is invalid:`, activity);
+            return null;
+          }
+          
+          return {
+            activity_number: activity.activity_number || `${actIndex + 1}`,
+            activity_title_amharic: activity.activity_title_amharic || '',
+            target_number: Number(activity.target_number) || 0,
+            target_unit_amharic: activity.target_unit_amharic || '',
+            achieved_number: Number(activity.achieved_number) || 0,
+            achievement_percentage: Number(activity.achievement_percentage) || 0,
+            status: activity.status || 'pending',
+            notes_amharic: activity.notes_amharic || '',
+            submitted_at: activity.submitted_at || null
+          };
+        }).filter(Boolean); // Remove null activities
+        
+        return safeReport;
       }).filter(Boolean); // Remove null entries
       
       console.log('Validated reports:', validatedReports.length);
       console.log('=== END FRONTEND DEBUG ===');
-      setAllReports(validatedReports);
+      setAllReports(validatedReports || []);
     } catch (error) {
       console.error('Failed to fetch Amharic activity reports:', error);
       console.error('Error details:', error.response?.data || error.message);
@@ -96,9 +130,9 @@ function MainBranchDashboard({ user, onLogout }) {
 
   const handleExport = async (format) => {
     try {
-      console.log('Exporting reports:', { format, count: allReports.length, reports: allReports });
+      console.log('Exporting reports:', { format, count: allReports?.length || 0, reportsType: typeof allReports });
       
-      if (allReports.length === 0) {
+      if (!allReports || !Array.isArray(allReports) || allReports.length === 0) {
         alert(t('ምንም ሪፖርቶች የሉም', 'No reports to export'));
         return;
       }
@@ -108,25 +142,47 @@ function MainBranchDashboard({ user, onLogout }) {
       
       console.log('Export params:', { month, year, language });
       
-      // Flatten the grouped data for export
-      const flattenedReports = allReports.flatMap(branchReport => {
-        if (!branchReport.activities || !Array.isArray(branchReport.activities)) {
-          console.warn('Invalid branchReport structure:', branchReport);
-          return [];
+      // Flatten the grouped data for export with enhanced safety
+      const flattenedReports = [];
+      
+      allReports.forEach((branchReport, branchIndex) => {
+        if (!branchReport || typeof branchReport !== 'object') {
+          console.warn(`Invalid branchReport at index ${branchIndex}:`, branchReport);
+          return;
         }
-        return branchReport.activities.map(activity => ({
-          branch_name: branchReport.branch_name,
-          plan_title: branchReport.plan_title,
-          plan_title_amharic: branchReport.plan_title_amharic,
-          activity_number: activity.activity_number,
-          activity_title_amharic: activity.activity_title_amharic,
-          target_number: activity.target_number,
-          target_unit_amharic: activity.target_unit_amharic,
-          achieved_number: activity.achieved_number,
-          achievement_percentage: activity.achievement_percentage,
-          status: activity.status
-        }));
+        
+        if (!branchReport.activities || !Array.isArray(branchReport.activities)) {
+          console.warn(`Invalid branchReport activities at index ${branchIndex}:`, branchReport);
+          return;
+        }
+        
+        branchReport.activities.forEach((activity, actIndex) => {
+          if (!activity || typeof activity !== 'object') {
+            console.warn(`Invalid activity at index ${actIndex} for branch ${branchIndex}:`, activity);
+            return;
+          }
+          
+          flattenedReports.push({
+            branch_name: branchReport.branch_name || 'Unknown Branch',
+            plan_title: branchReport.plan_title || 'Unknown Plan',
+            plan_title_amharic: branchReport.plan_title_amharic || '',
+            activity_number: activity.activity_number || '',
+            activity_title_amharic: activity.activity_title_amharic || '',
+            target_number: Number(activity.target_number) || 0,
+            target_unit_amharic: activity.target_unit_amharic || '',
+            achieved_number: Number(activity.achieved_number) || 0,
+            achievement_percentage: Number(activity.achievement_percentage) || 0,
+            status: activity.status || 'pending'
+          });
+        });
       });
+      
+      if (flattenedReports.length === 0) {
+        alert(t('ምንም ሪፖርቶች የሉም', 'No valid reports to export'));
+        return;
+      }
+      
+      console.log('Flattened reports for export:', flattenedReports.length);
       
       if (format === 'pdf') {
         exportToPDF(flattenedReports, month, year, language);
@@ -164,44 +220,63 @@ function MainBranchDashboard({ user, onLogout }) {
   };
 
   // Prepare chart data for grouped Amharic activity reports
-  const chartData = React.useMemo(() => {
-    if (!Array.isArray(allReports)) {
-      console.warn('allReports is not an array:', allReports);
+  const chartData = useMemo(() => {
+    try {
+      if (!allReports || !Array.isArray(allReports)) {
+        console.warn('allReports is not an array:', allReports);
+        return [];
+      }
+      
+      const processedData = allReports.map((branchReport, index) => {
+        if (!branchReport || typeof branchReport !== 'object') {
+          console.warn(`Invalid branchReport at index ${index}:`, branchReport);
+          return {
+            name: `Branch ${index + 1}`,
+            progress: 0,
+            achieved: 0,
+            target: 0
+          };
+        }
+        
+        const safeBranchName = branchReport.branch_name || `Branch ${index + 1}`;
+        
+        if (!branchReport.activities || !Array.isArray(branchReport.activities)) {
+          console.warn(`Invalid branchReport activities at index ${index}:`, branchReport);
+          return {
+            name: safeBranchName,
+            progress: 0,
+            achieved: 0,
+            target: 0
+          };
+        }
+        
+        let totalAchieved = 0;
+        let totalTarget = 0;
+        
+        branchReport.activities.forEach((activity, actIndex) => {
+          if (activity && typeof activity === 'object') {
+            totalAchieved += Number(activity.achieved_number) || 0;
+            totalTarget += Number(activity.target_number) || 0;
+          } else {
+            console.warn(`Invalid activity at index ${actIndex} for branch ${safeBranchName}:`, activity);
+          }
+        });
+        
+        const progress = totalTarget > 0 ? Math.round((totalAchieved / totalTarget) * 100) : 0;
+        
+        return {
+          name: safeBranchName,
+          progress: Math.max(0, Math.min(100, progress)), // Clamp between 0-100
+          achieved: totalAchieved,
+          target: totalTarget
+        };
+      });
+      
+      return processedData.sort((a, b) => (b.progress || 0) - (a.progress || 0));
+    } catch (error) {
+      console.error('Error processing chart data:', error);
       return [];
     }
-    
-    return allReports.map(branchReport => {
-      if (!branchReport || typeof branchReport !== 'object') {
-        console.warn('Invalid branchReport:', branchReport);
-        return {
-          name: 'Unknown Branch',
-          progress: 0,
-          achieved: 0,
-          target: 0
-        };
-      }
-      
-      if (!branchReport.activities || !Array.isArray(branchReport.activities)) {
-        console.warn('Invalid branchReport structure for chart:', branchReport);
-        return {
-          name: branchReport.branch_name || 'Unknown Branch',
-          progress: 0,
-          achieved: 0,
-          target: 0
-        };
-      }
-      
-      const totalAchieved = branchReport.activities.reduce((sum, activity) => sum + (activity?.achieved_number || 0), 0);
-      const totalTarget = branchReport.activities.reduce((sum, activity) => sum + (activity?.target_number || 0), 0);
-      const progress = totalTarget > 0 ? Math.round((totalAchieved / totalTarget) * 100) : 0;
-      
-      return {
-        name: branchReport.branch_name || 'Unknown Branch',
-        progress,
-        achieved: totalAchieved,
-        target: totalTarget
-      };
-    }).sort((a, b) => b.progress - a.progress);
   }, [allReports]);
 
   const gradeDistribution = chartData.reduce((acc, branch) => {
