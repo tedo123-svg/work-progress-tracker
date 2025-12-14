@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { monthlyPlanAPI, reportAPI, annualPlanAPI } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
@@ -49,29 +49,41 @@ function MainBranchDashboard({ user, onLogout }) {
       const response = await annualPlanAPI.getAllAmharicActivityReports();
       console.log('=== FRONTEND: Response received ===');
       console.log('Total activity reports received:', response.data.length);
+      console.log('Raw response data:', response.data);
       
-      if (response.data.length > 0) {
-        console.log('Sample reports:', response.data.slice(0, 3).map(r => ({ 
-          activity: r.activity_number, 
-          branch: r.branch_name,
-          achieved: r.achieved_number,
-          target: r.target_number,
-          status: r.status,
-          month: r.month,
-          year: r.year
-        })));
-      } else {
-        console.log('No reports found. This could mean:');
-        console.log('1. No Amharic plans have been created yet');
-        console.log('2. No branch users have submitted reports yet');
-        console.log('3. Reports exist but for different months');
-      }
+      // Validate the response data structure
+      const validatedReports = response.data.map((report, index) => {
+        if (!report) {
+          console.warn(`Report at index ${index} is null/undefined`);
+          return null;
+        }
+        
+        if (!report.activities) {
+          console.warn(`Report at index ${index} missing activities:`, report);
+          return {
+            ...report,
+            activities: []
+          };
+        }
+        
+        if (!Array.isArray(report.activities)) {
+          console.warn(`Report at index ${index} activities is not an array:`, report.activities);
+          return {
+            ...report,
+            activities: []
+          };
+        }
+        
+        return report;
+      }).filter(Boolean); // Remove null entries
       
+      console.log('Validated reports:', validatedReports.length);
       console.log('=== END FRONTEND DEBUG ===');
-      setAllReports(response.data);
+      setAllReports(validatedReports);
     } catch (error) {
       console.error('Failed to fetch Amharic activity reports:', error);
       console.error('Error details:', error.response?.data || error.message);
+      setAllReports([]); // Set empty array on error
     } finally {
       setLoadingReports(false);
     }
@@ -149,28 +161,45 @@ function MainBranchDashboard({ user, onLogout }) {
   };
 
   // Prepare chart data for grouped Amharic activity reports
-  const chartData = allReports.map(branchReport => {
-    if (!branchReport.activities || !Array.isArray(branchReport.activities)) {
-      console.warn('Invalid branchReport structure for chart:', branchReport);
-      return {
-        name: branchReport.branch_name || 'Unknown Branch',
-        progress: 0,
-        achieved: 0,
-        target: 0
-      };
+  const chartData = React.useMemo(() => {
+    if (!Array.isArray(allReports)) {
+      console.warn('allReports is not an array:', allReports);
+      return [];
     }
     
-    const totalAchieved = branchReport.activities.reduce((sum, activity) => sum + (activity.achieved_number || 0), 0);
-    const totalTarget = branchReport.activities.reduce((sum, activity) => sum + (activity.target_number || 0), 0);
-    const progress = totalTarget > 0 ? Math.round((totalAchieved / totalTarget) * 100) : 0;
-    
-    return {
-      name: branchReport.branch_name,
-      progress,
-      achieved: totalAchieved,
-      target: totalTarget
-    };
-  }).sort((a, b) => b.progress - a.progress);
+    return allReports.map(branchReport => {
+      if (!branchReport || typeof branchReport !== 'object') {
+        console.warn('Invalid branchReport:', branchReport);
+        return {
+          name: 'Unknown Branch',
+          progress: 0,
+          achieved: 0,
+          target: 0
+        };
+      }
+      
+      if (!branchReport.activities || !Array.isArray(branchReport.activities)) {
+        console.warn('Invalid branchReport structure for chart:', branchReport);
+        return {
+          name: branchReport.branch_name || 'Unknown Branch',
+          progress: 0,
+          achieved: 0,
+          target: 0
+        };
+      }
+      
+      const totalAchieved = branchReport.activities.reduce((sum, activity) => sum + (activity?.achieved_number || 0), 0);
+      const totalTarget = branchReport.activities.reduce((sum, activity) => sum + (activity?.target_number || 0), 0);
+      const progress = totalTarget > 0 ? Math.round((totalAchieved / totalTarget) * 100) : 0;
+      
+      return {
+        name: branchReport.branch_name || 'Unknown Branch',
+        progress,
+        achieved: totalAchieved,
+        target: totalTarget
+      };
+    }).sort((a, b) => b.progress - a.progress);
+  }, [allReports]);
 
   const gradeDistribution = chartData.reduce((acc, branch) => {
     const gradeInfo = calculateGrade(branch.progress);
