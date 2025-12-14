@@ -94,8 +94,12 @@ function MainBranchDashboard({ user, onLogout }) {
       console.log('Export params:', { month, year, language });
       
       // Flatten the grouped data for export
-      const flattenedReports = allReports.flatMap(branchReport => 
-        branchReport.activities.map(activity => ({
+      const flattenedReports = allReports.flatMap(branchReport => {
+        if (!branchReport.activities || !Array.isArray(branchReport.activities)) {
+          console.warn('Invalid branchReport structure:', branchReport);
+          return [];
+        }
+        return branchReport.activities.map(activity => ({
           branch_name: branchReport.branch_name,
           plan_title: branchReport.plan_title,
           plan_title_amharic: branchReport.plan_title_amharic,
@@ -106,8 +110,8 @@ function MainBranchDashboard({ user, onLogout }) {
           achieved_number: activity.achieved_number,
           achievement_percentage: activity.achievement_percentage,
           status: activity.status
-        }))
-      );
+        }));
+      });
       
       if (format === 'pdf') {
         exportToPDF(flattenedReports, month, year, language);
@@ -146,6 +150,16 @@ function MainBranchDashboard({ user, onLogout }) {
 
   // Prepare chart data for grouped Amharic activity reports
   const chartData = allReports.map(branchReport => {
+    if (!branchReport.activities || !Array.isArray(branchReport.activities)) {
+      console.warn('Invalid branchReport structure for chart:', branchReport);
+      return {
+        name: branchReport.branch_name || 'Unknown Branch',
+        progress: 0,
+        achieved: 0,
+        target: 0
+      };
+    }
+    
     const totalAchieved = branchReport.activities.reduce((sum, activity) => sum + (activity.achieved_number || 0), 0);
     const totalTarget = branchReport.activities.reduce((sum, activity) => sum + (activity.target_number || 0), 0);
     const progress = totalTarget > 0 ? Math.round((totalAchieved / totalTarget) * 100) : 0;
@@ -500,18 +514,24 @@ function MainBranchDashboard({ user, onLogout }) {
                 </div>
               ) : (
                 <div className="space-y-4 p-6">
-                  {allReports.map((branchReport, index) => (
+                  {allReports.map((branchReport, index) => {
+                    if (!branchReport.activities || !Array.isArray(branchReport.activities)) {
+                      console.warn('Invalid branchReport structure in render:', branchReport);
+                      return null;
+                    }
+                    
+                    return (
                     <div key={`${branchReport.branch_name}-${index}`} className="bg-white/5 rounded-xl p-5 border border-white/10">
                       {/* Branch Header */}
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center font-bold text-white text-lg">
-                            {branchReport.branch_name.charAt(branchReport.branch_name.length - 1)}
+                            {branchReport.branch_name?.charAt(branchReport.branch_name.length - 1) || '?'}
                           </div>
                           <div>
-                            <h3 className="text-lg font-semibold text-white">{branchReport.branch_name}</h3>
+                            <h3 className="text-lg font-semibold text-white">{branchReport.branch_name || 'Unknown Branch'}</h3>
                             <p className="text-sm text-purple-200" style={{ fontFamily: "'Noto Sans Ethiopic', sans-serif" }}>
-                              {branchReport.plan_title_amharic || branchReport.plan_title}
+                              {branchReport.plan_title_amharic || branchReport.plan_title || 'No Plan Title'}
                             </p>
                           </div>
                         </div>
@@ -578,7 +598,8 @@ function MainBranchDashboard({ user, onLogout }) {
                         })}
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
