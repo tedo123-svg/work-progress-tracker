@@ -25,7 +25,7 @@ function BranchUserDashboard({ user, onLogout }) {
     try {
       // Fetch all Amharic plans
       const plansResponse = await annualPlanAPI.getAll();
-      const amharicPlansOnly = plansResponse.data.filter(plan => plan.plan_type === 'amharic_structured');
+      const amharicPlansOnly = (plansResponse.data || []).filter(plan => plan.plan_type === 'amharic_structured');
       setAmharicPlans(amharicPlansOnly);
 
       // Calculate statistics
@@ -62,6 +62,14 @@ function BranchUserDashboard({ user, onLogout }) {
       });
     } catch (error) {
       console.error('Failed to fetch Amharic plans:', error);
+      // Set empty states to prevent undefined errors
+      setAmharicPlans([]);
+      setPlanStats({
+        totalPlans: 0,
+        totalActivities: 0,
+        submittedReports: 0,
+        pendingReports: 0
+      });
     } finally {
       setLoading(false);
     }
@@ -94,12 +102,12 @@ function BranchUserDashboard({ user, onLogout }) {
     );
   };
 
-  // Stats are calculated from filtered reports (only future months)
+  // Stats are calculated from planStats (already calculated in fetchAmharicPlansAndReports)
   const stats = {
-    total: reports.length,
-    pending: reports.filter(r => r.status === 'pending').length,
-    submitted: reports.filter(r => r.status === 'submitted').length,
-    late: reports.filter(r => r.status === 'late').length,
+    total: planStats.totalActivities,
+    pending: planStats.pendingReports,
+    submitted: planStats.submittedReports,
+    late: 0, // We don't track late status in this component
   };
 
   return (
