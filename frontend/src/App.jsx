@@ -8,6 +8,7 @@ import AdminDashboard from './pages/AdminDashboard';
 
 import CreateAnnualPlan from './pages/CreateAnnualPlan';
 import CreateAmharicPlan from './pages/CreateAmharicPlan';
+import AmharicPlanReports from './pages/AmharicPlanReports';
 import ViewAnnualPlan from './pages/ViewAnnualPlan';
 import SubmitReport from './pages/SubmitReport';
 import BranchComparison from './pages/BranchComparison';
@@ -87,6 +88,11 @@ function App() {
         <Route 
           path="/create-amharic-plan" 
           element={user?.role === 'main_branch' ? <CreateAmharicPlan user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
+        />
+        
+        <Route 
+          path="/amharic-plan-reports" 
+          element={user?.role === 'branch_user' ? <AmharicPlanReports user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
         />
         
         <Route 
