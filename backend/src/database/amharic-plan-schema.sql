@@ -5,6 +5,7 @@
 ALTER TABLE annual_plans ADD COLUMN IF NOT EXISTS plan_title_amharic TEXT;
 ALTER TABLE annual_plans ADD COLUMN IF NOT EXISTS plan_description_amharic TEXT;
 ALTER TABLE annual_plans ADD COLUMN IF NOT EXISTS plan_type VARCHAR(50) DEFAULT 'standard';
+ALTER TABLE annual_plans ADD COLUMN IF NOT EXISTS plan_month INTEGER DEFAULT 1;
 
 -- Plan Activities Table (hierarchical structure like 3.2.1, 3.2.2)
 CREATE TABLE IF NOT EXISTS plan_activities (

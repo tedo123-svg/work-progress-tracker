@@ -143,13 +143,13 @@ export const createAmharicPlan = async (req, res) => {
   try {
     await client.query('BEGIN');
     
-    const { title, title_amharic, description_amharic, year, plan_type, activities } = req.body;
+    const { title, title_amharic, description_amharic, year, month, plan_type, activities } = req.body;
     
     // Create the annual plan with Amharic fields
     const planResult = await client.query(
-      `INSERT INTO annual_plans (title, plan_title_amharic, plan_description_amharic, year, plan_type, created_by) 
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [title, title_amharic, description_amharic, year, plan_type || 'amharic_structured', req.user.id]
+      `INSERT INTO annual_plans (title, plan_title_amharic, plan_description_amharic, year, plan_month, plan_type, created_by) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [title, title_amharic, description_amharic, year, month || 1, plan_type || 'amharic_structured', req.user.id]
     );
 
     const plan = planResult.rows[0];

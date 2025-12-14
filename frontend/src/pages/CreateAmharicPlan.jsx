@@ -4,6 +4,7 @@ import { annualPlanAPI } from '../services/api';
 import Navbar from '../components/Navbar';
 import { ArrowLeft, Plus, Trash2, Save } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { ETHIOPIAN_MONTHS, getCurrentEthiopianMonth } from '../utils/ethiopianCalendar';
 
 function CreateAmharicPlan({ user, onLogout }) {
   const { t } = useLanguage();
@@ -13,6 +14,7 @@ function CreateAmharicPlan({ user, onLogout }) {
     title_amharic: '',
     description_amharic: '',
     year: new Date().getFullYear(),
+    month: getCurrentEthiopianMonth(),
     plan_type: 'amharic_structured'
   });
   
@@ -122,7 +124,7 @@ function CreateAmharicPlan({ user, onLogout }) {
                 📝 የእቅድ መሰረታዊ መረጃ
               </h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-purple-200 mb-2">
                     የእቅድ ርዕስ (English) *
@@ -135,6 +137,25 @@ function CreateAmharicPlan({ user, onLogout }) {
                     placeholder="e.g., Social Development Plan 2025"
                     required
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-purple-200 mb-2">
+                    ወር *
+                  </label>
+                  <select
+                    value={formData.month}
+                    onChange={(e) => setFormData({ ...formData, month: parseInt(e.target.value) })}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm"
+                    style={{ fontFamily: "'Noto Sans Ethiopic', sans-serif" }}
+                    required
+                  >
+                    {ETHIOPIAN_MONTHS.map(month => (
+                      <option key={month.number} value={month.number} className="bg-slate-800">
+                        {month.amharic} ({month.english})
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>
@@ -286,7 +307,10 @@ function CreateAmharicPlan({ user, onLogout }) {
                 👁️ የእቅድ ቅድመ እይታ
               </h3>
               <div className="bg-white/10 rounded-lg p-4 font-mono text-sm text-white" style={{ fontFamily: "'Noto Sans Ethiopic', sans-serif" }}>
-                <div className="font-bold text-lg mb-4">{formData.title_amharic || 'ዓላማ፡- ...'}</div>
+                <div className="font-bold text-lg mb-2">{formData.title_amharic || 'ዓላማ፡- ...'}</div>
+                <div className="text-purple-300 mb-4 text-sm">
+                  {ETHIOPIAN_MONTHS.find(m => m.number === formData.month)?.amharic} {formData.year} - የእቅድ ወር
+                </div>
                 {activities.map((activity, index) => (
                   <div key={activity.id} className="mb-2 flex items-start gap-4">
                     <span className="font-bold text-blue-300 min-w-[60px]">{activity.activity_number}</span>
