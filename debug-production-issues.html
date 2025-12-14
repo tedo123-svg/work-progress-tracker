@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Debug Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .error { color: red; background: #ffe6e6; padding: 10px; margin: 10px 0; }
+        .success { color: green; background: #e6ffe6; padding: 10px; margin: 10px 0; }
+        .warning { color: orange; background: #fff3e6; padding: 10px; margin: 10px 0; }
+        .test-section { border: 1px solid #ccc; padding: 15px; margin: 15px 0; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Production Issue Diagnostic Tool</h1>
+    <p>This tool will help identify the root cause of issues on: <strong>https://work-progress-tracker-rho.vercel.app/</strong></p>
+
+    <div class="test-section">
+        <h2>1. Frontend Asset Loading Test</h2>
+        <button onclick="testAssets()">Test Asset Loading</button>
+        <div id="asset-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Backend API Connectivity Test</h2>
+        <button onclick="testBackendAPI()">Test Backend Connection</button>
+        <div id="api-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. JavaScript Error Detection</h2>
+        <button onclick="testJSErrors()">Check for JS Errors</button>
+        <div id="js-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Environment Variables Check</h2>
+        <button onclick="testEnvVars()">Check Environment Setup</button>
+        <div id="env-results"></div>
+    </div>
+
+    <script>
+        // Capture all JavaScript errors
+        window.addEventListener('error', function(e) {
+            console.error('JavaScript Error:', e.error);
+            document.getElementById('js-results').innerHTML += 
+                `<div class="error">JS Error: ${e.message} at ${e.filename}:${e.lineno}</div>`;
+        });
+
+        async function testAssets() {
+            const results = document.getElementById('asset-results');
+            results.innerHTML = '<p>Testing asset loading...</p>';
+            
+            const assets = [
+                '/assets/index-D7nypqaR.js',
+                '/assets/index-D7nypqaR.css',
+                '/vite.svg',
+                '/favicon.ico'
+            ];
+            
+            let html = '';
+            for (const asset of assets) {
+                try {
+                    const response = await fetch(asset);
+                    if (response.ok) {
+                        html += `<div class="success">✅ ${asset} - OK (${response.status})</div>`;
+                    } else {
+                        html += `<div class="error">❌ ${asset} - Failed (${response.status})</div>`;
+                    }
+                } catch (error) {
+                    html += `<div class="error">❌ ${asset} - Error: ${error.message}</div>`;
+                }
+            }
+            results.innerHTML = html;
+        }
+
+        async function testBackendAPI() {
+            const results = document.getElementById('api-results');
+            results.innerHTML = '<p>Testing backend API...</p>';
+            
+            // Try to detect the backend URL from the current environment
+            const possibleBackends = [
+                'https://work-progress-tracker-backend.vercel.app',
+                'https://work-progress-tracker-backend.onrender.com',
+                'https://api.work-progress-tracker.com',
+                'http://localhost:5000'
+            ];
+            
+            let html = '';
+            for (const backend of possibleBackends) {
+                try {
+                    const response = await fetch(`${backend}/api/health`, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (response.ok) {
+                        html += `<div class="success">✅ Backend found: ${backend}</div>`;
+                        break;
+                    } else {
+                        html += `<div class="warning">⚠️ ${backend} - Status: ${response.status}</div>`;
+                    }
+                } catch (error) {
+                    html += `<div class="error">❌ ${backend} - Error: ${error.message}</div>`;
+                }
+            }
+            results.innerHTML = html;
+        }
+
+        function testJSErrors() {
+            const results = document.getElementById('js-results');
+            results.innerHTML = '<p>Checking for common JavaScript issues...</p>';
+            
+            let html = '';
+            
+            // Test for undefined variables that commonly cause issues
+            const commonIssues = [
+                { name: 'reports', test: () => typeof reports !== 'undefined' },
+                { name: 'React', test: () => typeof React !== 'undefined' },
+                { name: 'ReactDOM', test: () => typeof ReactDOM !== 'undefined' },
+                { name: 'localStorage', test: () => typeof localStorage !== 'undefined' },
+                { name: 'fetch', test: () => typeof fetch !== 'undefined' }
+            ];
+            
+            commonIssues.forEach(issue => {
+                try {
+                    if (issue.test()) {
+                        html += `<div class="success">✅ ${issue.name} is available</div>`;
+                    } else {
+                        html += `<div class="error">❌ ${issue.name} is not defined</div>`;
+                    }
+                } catch (error) {
+                    html += `<div class="error">❌ ${issue.name} - Error: ${error.message}</div>`;
+                }
+            });
+            
+            results.innerHTML = html;
+        }
+
+        function testEnvVars() {
+            const results = document.getElementById('env-results');
+            results.innerHTML = '<p>Checking environment configuration...</p>';
+            
+            let html = '';
+            
+            // Check for common environment issues
+            html += `<div class="warning">Current URL: ${window.location.href}</div>`;
+            html += `<div class="warning">User Agent: ${navigator.userAgent}</div>`;
+            html += `<div class="warning">Protocol: ${window.location.protocol}</div>`;
+            
+            // Check if we're in production
+            if (window.location.hostname.includes('vercel.app')) {
+                html += `<div class="success">✅ Running on Vercel production</div>`;
+            } else if (window.location.hostname === 'localhost') {
+                html += `<div class="warning">⚠️ Running on localhost</div>`;
+            } else {
+                html += `<div class="error">❌ Unknown hosting environment</div>`;
+            }
+            
+            results.innerHTML = html;
+        }
+
+        // Auto-run basic checks on page load
+        window.addEventListener('load', function() {
+            console.log('🔍 Production Debug Tool Loaded');
+            console.log('Run tests manually or check console for automatic error detection');
+        });
+    </script>
+</body>
+</html>
