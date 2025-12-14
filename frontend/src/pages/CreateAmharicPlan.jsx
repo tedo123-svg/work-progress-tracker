@@ -31,7 +31,7 @@ function CreateAmharicPlan({ user, onLogout }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Common Amharic units
+  // Common Amharic units for target measurements
   const commonUnits = [
     'ሰዎች', 'ቤተሰቦች', 'ክንውን', 'ስራዎች', 'ፕሮጀክቶች', 
     'ስልጠናዎች', 'ወርሻዎች', 'ማህበራት', 'ቡድኖች', 'መርሃ ግብሮች'
