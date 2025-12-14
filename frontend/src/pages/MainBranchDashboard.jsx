@@ -210,25 +210,36 @@ function MainBranchDashboard({ user, onLogout }) {
               <Edit size={20} />
               <span className="font-semibold">{t('ዒላማ አዘምን', 'Update Target')}</span>
             </button>
+            
             {user.role === 'main_branch' && (
-              <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-xl px-3 py-2">
-                <select
-                  value={selectedPlanId}
-                  onChange={(e) => setSelectedPlanId(e.target.value)}
-                  className="bg-transparent text-white text-sm"
-                >
-                  {annualPlans.map(p => (
-                    <option key={p.id} value={p.id} className="bg-slate-800">{p.title} ({p.year})</option>
-                  ))}
-                </select>
+              <>
                 <button
-                  onClick={() => selectedPlanId && navigate(`/create-actions/${selectedPlanId}`)}
-                  className="flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white px-4 py-2 rounded-lg transition text-sm font-semibold"
+                  onClick={() => navigate('/create-amharic-plan')}
+                  className="flex items-center space-x-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-xl transition transform hover:scale-105 shadow-lg"
                 >
-                  <Target size={16} />
-                  {t('ተግባሮች ጨምር', 'Add Activities')}
+                  <FileText size={20} />
+                  <span className="font-semibold">{t('የአማርኛ እቅድ ፍጠር', 'Create Amharic Plan')}</span>
                 </button>
-              </div>
+                
+                <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-xl px-3 py-2">
+                  <select
+                    value={selectedPlanId}
+                    onChange={(e) => setSelectedPlanId(e.target.value)}
+                    className="bg-transparent text-white text-sm"
+                  >
+                    {annualPlans.map(p => (
+                      <option key={p.id} value={p.id} className="bg-slate-800">{p.title} ({p.year})</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => selectedPlanId && navigate(`/create-actions/${selectedPlanId}`)}
+                    className="flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white px-4 py-2 rounded-lg transition text-sm font-semibold"
+                  >
+                    <Target size={16} />
+                    {t('ተግባሮች ጨምር', 'Add Activities')}
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>

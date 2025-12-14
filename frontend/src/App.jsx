@@ -7,6 +7,7 @@ import BranchUserDashboard from './pages/BranchUserDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 
 import CreateAnnualPlan from './pages/CreateAnnualPlan';
+import CreateAmharicPlan from './pages/CreateAmharicPlan';
 import ViewAnnualPlan from './pages/ViewAnnualPlan';
 import SubmitReport from './pages/SubmitReport';
 import BranchComparison from './pages/BranchComparison';
@@ -81,6 +82,11 @@ function App() {
         <Route 
           path="/create-plan" 
           element={user?.role === 'main_branch' ? <CreateAnnualPlan user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
+        />
+        
+        <Route 
+          path="/create-amharic-plan" 
+          element={user?.role === 'main_branch' ? <CreateAmharicPlan user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
         />
         
         <Route 
