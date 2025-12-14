@@ -29,11 +29,12 @@ function SubmitAmharicReport({ user, onLogout }) {
 
       // Fetch plan activities
       const activitiesResponse = await annualPlanAPI.getPlanActivities(planId);
-      setActivities(activitiesResponse.data);
+      const activitiesData = activitiesResponse.data || [];
+      setActivities(activitiesData);
 
       // Initialize reports state
       const initialReports = {};
-      activitiesResponse.data.forEach(activity => {
+      activitiesData.forEach(activity => {
         initialReports[activity.id] = {
           achieved_number: 0,
           notes_amharic: ''
@@ -43,6 +44,9 @@ function SubmitAmharicReport({ user, onLogout }) {
     } catch (err) {
       setError('Failed to fetch plan data');
       console.error('Error fetching plan:', err);
+      // Set empty states to prevent undefined errors
+      setActivities([]);
+      setReports({});
     } finally {
       setLoading(false);
     }
@@ -179,7 +183,7 @@ function SubmitAmharicReport({ user, onLogout }) {
 
               <div className="space-y-6">
                 {activities.map((activity, index) => {
-                  const report = reports[activity.id] || { achieved_number: 0, notes_amharic: '' };
+                  const report = (reports && reports[activity.id]) || { achieved_number: 0, notes_amharic: '' };
                   const percentage = calculatePercentage(report.achieved_number, activity.target_number);
                   
                   return (
