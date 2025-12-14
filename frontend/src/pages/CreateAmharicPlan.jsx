@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { annualPlanAPI } from '../services/api';
 import Navbar from '../components/Navbar';
-import { ArrowLeft, Plus, Trash2, Save } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Save, Target } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ETHIOPIAN_MONTHS, getCurrentEthiopianMonth } from '../utils/ethiopianCalendar';
 
