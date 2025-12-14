@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Debug - Direct Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        .loading { color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Production Debug Tool</h1>
+        <p><strong>Current URL:</strong> <span id="current-url"></span></p>
+        <p><strong>Environment:</strong> <span id="environment"></span></p>
+        
+        <div id="results"></div>
+        
+        <button onclick="runAllTests()">🚀 Run All Tests</button>
+        <button onclick="testBackendConnection()">🔗 Test Backend</button>
+        <button onclick="testLogin()">🔐 Test Login</button>
+        <button onclick="clearResults()">🗑️ Clear Results</button>
+    </div>
+
+    <script>
+        // Initialize page
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('environment').textContent = 
+            window.location.hostname === 'localhost' ? 'Local Development' : 
+            window.location.hostname.includes('vercel.app') ? 'Vercel Production' : 'Unknown';
+
+        function addResult(type, title, message, details = null) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            
+            let html = `<strong>${title}</strong><br>${message}`;
+            if (details) {
+                html += `<pre>${JSON.stringify(details, null, 2)}</pre>`;
+            }
+            div.innerHTML = html;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        // Determine API URL using same logic as the app
+        function getApiUrl() {
+            // Try to get from environment (this won't work in browser, but let's try)
+            const envApiUrl = null; // Can't access import.meta.env in regular HTML
+            
+            if (envApiUrl) {
+                return envApiUrl;
+            }
+            
+            // Use fallback logic
+            if (window.location.hostname === 'localhost') {
+                return 'http://localhost:5000/api';
+            } else {
+                return 'https://work-progress-tracker.onrender.com/api';
+            }
+        }
+
+        async function testBackendConnection() {
+            const apiUrl = getApiUrl();
+            addResult('info', '🔍 Backend Connection Test', `Testing: ${apiUrl}`);
+            
+            try {
+                // Test health endpoint
+                const healthUrl = apiUrl.replace('/api', '') + '/api/health';
+                addResult('info', '⏳ Testing Health Endpoint', `GET ${healthUrl}`);
+                
+                const response = await fetch(healthUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.text();
+                
+                if (response.ok) {
+                    addResult('success', '✅ Backend Health Check', `Status: ${response.status}`, {
+                        status: response.status,
+                        response: data,
+                        responseTime: 'N/A'
+                    });
+                } else {
+                    addResult('error', '❌ Backend Health Check Failed', `Status: ${response.status}`, {
+                        status: response.status,
+                        response: data
+                    });
+                }
+                
+            } catch (error) {
+                addResult('error', '💥 Backend Connection Error', error.message, {
+                    error: error.toString(),
+                    apiUrl: apiUrl
+                });
+            }
+        }
+
+        async function testLogin() {
+            const apiUrl = getApiUrl();
+            addResult('info', '🔐 Login Test', 'Testing login endpoint with dummy credentials');
+            
+            try {
+                const loginUrl = `${apiUrl}/auth/login`;
+                const response = await fetch(loginUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'testpassword'
+                    })
+                });
+                
+                const data = await response.text();
+                
+                if (response.status === 401 || response.status === 400) {
+                    addResult('success', '✅ Login Endpoint Working', 'Endpoint responds correctly (invalid credentials expected)', {
+                        status: response.status,
+                        response: data
+                    });
+                } else if (response.status === 200) {
+                    addResult('warning', '⚠️ Unexpected Login Success', 'Login succeeded with test credentials', {
+                        status: response.status,
+                        response: data
+                    });
+                } else {
+                    addResult('error', '❌ Login Endpoint Error', `Unexpected status: ${response.status}`, {
+                        status: response.status,
+                        response: data
+                    });
+                }
+                
+            } catch (error) {
+                addResult('error', '💥 Login Test Error', error.message, {
+                    error: error.toString(),
+                    apiUrl: apiUrl
+                });
+            }
+        }
+
+        async function testEnvironmentVariables() {
+            addResult('info', '🌍 Environment Variables', 'Checking environment configuration');
+            
+            // Check what API URL would be used
+            const apiUrl = getApiUrl();
+            addResult('info', '🔗 Detected API URL', apiUrl);
+            
+            // Check if we're in the right environment
+            const isProduction = window.location.hostname.includes('vercel.app');
+            const expectedApiUrl = 'https://work-progress-tracker.onrender.com/api';
+            
+            if (isProduction && apiUrl === expectedApiUrl) {
+                addResult('success', '✅ Environment Configuration', 'API URL is correctly configured for production');
+            } else if (isProduction && apiUrl !== expectedApiUrl) {
+                addResult('error', '❌ Environment Configuration', `Expected: ${expectedApiUrl}, Got: ${apiUrl}`);
+            } else {
+                addResult('info', '📍 Local Development', 'Running in local development mode');
+            }
+        }
+
+        async function testCORS() {
+            addResult('info', '🌐 CORS Test', 'Testing cross-origin requests');
+            
+            const apiUrl = getApiUrl();
+            try {
+                const response = await fetch(`${apiUrl.replace('/api', '')}/api/health`, {
+                    method: 'OPTIONS'
+                });
+                
+                addResult('success', '✅ CORS Preflight', `Status: ${response.status}`, {
+                    status: response.status,
+                    headers: Object.fromEntries(response.headers.entries())
+                });
+                
+            } catch (error) {
+                addResult('error', '❌ CORS Error', error.message);
+            }
+        }
+
+        async function runAllTests() {
+            clearResults();
+            addResult('info', '🚀 Starting Comprehensive Tests', 'Running all diagnostic tests...');
+            
+            await testEnvironmentVariables();
+            await testBackendConnection();
+            await testCORS();
+            await testLogin();
+            
+            addResult('success', '✅ All Tests Complete', 'Check results above for any issues');
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                addResult('info', '🔄 Auto-Running Basic Tests', 'Running automatic diagnostics...');
+                testEnvironmentVariables();
+                testBackendConnection();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
