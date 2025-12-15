@@ -435,6 +435,7 @@ export const getAllAmharicActivityReports = async (req, res) => {
          ap.id as plan_id,
          ap.title as plan_title,
          ap.plan_title_amharic,
+         ap.goal_amharic,
          ap.plan_month as month,
          ap.year,
          json_agg(
@@ -458,7 +459,7 @@ export const getAllAmharicActivityReports = async (req, res) => {
        WHERE ap.plan_type = 'amharic_structured'
          AND mp.month = $1
          AND mp.year = $2
-       GROUP BY u.branch_name, u.username, ap.id, ap.title, ap.plan_title_amharic, ap.plan_month, ap.year
+       GROUP BY u.branch_name, u.username, ap.id, ap.title, ap.plan_title_amharic, ap.goal_amharic, ap.plan_month, ap.year
        ORDER BY u.branch_name`,
       [currentMonth, currentYear]
     );
@@ -548,13 +549,13 @@ export const createAmharicPlan = async (req, res) => {
   try {
     await client.query('BEGIN');
     
-    const { title, title_amharic, description_amharic, year, month, plan_type, activities } = req.body;
+    const { title, title_amharic, goal_amharic, description_amharic, year, month, plan_type, activities } = req.body;
     
-    // Create the annual plan with Amharic fields
+    // Create the annual plan with Amharic fields including goal
     const planResult = await client.query(
-      `INSERT INTO annual_plans (title, plan_title_amharic, plan_description_amharic, year, plan_month, plan_type, created_by) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [title, title_amharic, description_amharic, year, month || 1, plan_type || 'amharic_structured', req.user.id]
+      `INSERT INTO annual_plans (title, plan_title_amharic, goal_amharic, plan_description_amharic, year, plan_month, plan_type, created_by) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      [title, title_amharic, goal_amharic, description_amharic, year, month || 1, plan_type || 'amharic_structured', req.user.id]
     );
 
     const plan = planResult.rows[0];

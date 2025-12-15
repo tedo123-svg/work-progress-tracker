@@ -12,6 +12,7 @@ function CreateAmharicPlan({ user, onLogout }) {
   const [formData, setFormData] = useState({
     title: '',
     title_amharic: '',
+    goal_amharic: '',
     description_amharic: '',
     year: new Date().getFullYear(),
     month: getCurrentEthiopianMonth(),
@@ -171,6 +172,21 @@ function CreateAmharicPlan({ user, onLogout }) {
                     required
                   />
                 </div>
+              </div>
+
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-purple-200 mb-2">
+                  ግብ (የዋና ግብ መግለጫ) *
+                </label>
+                <input
+                  type="text"
+                  value={formData.goal_amharic}
+                  onChange={(e) => setFormData({ ...formData, goal_amharic: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm"
+                  placeholder="ግብ፡- የማህበራዊ ልማት እና የህብረተሰብ ተሳትፎ ማሻሻል"
+                  required
+                  style={{ fontFamily: "'Noto Sans Ethiopic', sans-serif" }}
+                />
               </div>
 
               <div className="mt-6">

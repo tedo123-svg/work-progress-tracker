@@ -479,7 +479,7 @@ function MainBranchDashboard({ user, onLogout }) {
                         <div>
                           <div className="text-sm text-purple-300 mb-1">{t('ግብ', 'Goal')}</div>
                           <span style={{ fontFamily: "'Noto Sans Ethiopic', sans-serif" }}>
-                            {currentAmharicPlan.plan_title_amharic || currentAmharicPlan.title}
+                            {currentAmharicPlan.goal_amharic || currentAmharicPlan.plan_title_amharic || currentAmharicPlan.title}
                           </span>
                         </div>
                       ) : t('የአማርኛ እቅዶች ሁኔታ', 'Amharic Plans Status')}
@@ -746,7 +746,7 @@ function MainBranchDashboard({ user, onLogout }) {
                         <div className="text-right">
                           <div className="text-sm text-purple-300 mb-1">{t('ግብ', 'Goal')}</div>
                           <div className="text-white font-medium" style={{ fontFamily: "'Noto Sans Ethiopic', sans-serif" }}>
-                            {branchReport.plan_title_amharic || branchReport.plan_title}
+                            {branchReport.goal_amharic || branchReport.plan_title_amharic || branchReport.plan_title}
                           </div>
                         </div>
                       </div>
