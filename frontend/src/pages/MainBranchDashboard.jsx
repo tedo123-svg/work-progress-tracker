@@ -712,7 +712,104 @@ function MainBranchDashboard({ user, onLogout }) {
               </div>
             )}
 
+            {/* Amharic Plan Reports Section */}
+            {allReports.length > 0 && (
+              <div className="glass rounded-2xl shadow-xl p-6 backdrop-blur-xl border border-white/20">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                    <FileText size={28} />
+                    {t('የአማርኛ እቅድ ሪፖርቶች', 'Amharic Plan Reports')}
+                  </h2>
+                  <div className="text-sm text-purple-300">
+                    {t('የወረዳዎች የአማርኛ እቅድ ሪፖርቶች ዝርዝር', 'Detailed Amharic plan reports from woredas')}
+                  </div>
+                </div>
 
+                <div className="space-y-4">
+                  {allReports.map((branchReport, branchIndex) => (
+                    <div key={`branch-${branchIndex}`} className="bg-white/5 rounded-xl p-5 border border-white/10">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                            <Users size={20} className="text-white" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-white">
+                              {transformBranchName(branchReport.branch_name, language)}
+                            </h3>
+                            <p className="text-sm text-purple-300">{branchReport.username}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm text-purple-300 mb-1">{t('እቅድ', 'Plan')}</div>
+                          <div className="text-white font-medium" style={{ fontFamily: "'Noto Sans Ethiopic', sans-serif" }}>
+                            {branchReport.plan_title_amharic || branchReport.plan_title}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Activities Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {branchReport.activities && branchReport.activities.map((activity, actIndex) => {
+                          const progress = Number(activity.achievement_percentage) || 0;
+                          const achieved = Number(activity.actual_achievement || activity.achieved_number) || 0;
+                          const target = Number(activity.target_number) || 0;
+                          
+                          return (
+                            <div key={`activity-${actIndex}`} className="bg-white/5 rounded-lg p-4 border border-white/10">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs font-semibold text-purple-300">
+                                  {t('እንቅስቃሴ', 'Activity')} {activity.activity_number}
+                                </span>
+                                {getStatusBadge(activity.status)}
+                              </div>
+                              
+                              <div className="mb-3">
+                                <div className="text-sm text-white font-medium mb-1" style={{ fontFamily: "'Noto Sans Ethiopic', sans-serif" }}>
+                                  {activity.activity_title_amharic}
+                                </div>
+                                <div className="text-xs text-purple-200">
+                                  {achieved.toLocaleString()} / {target.toLocaleString()} {activity.target_unit_amharic}
+                                </div>
+                              </div>
+
+                              {/* Progress Bar */}
+                              <div className="mb-2">
+                                <div className="flex justify-between text-xs text-purple-300 mb-1">
+                                  <span>{t('እድገት', 'Progress')}</span>
+                                  <span>{progress.toFixed(1)}%</span>
+                                </div>
+                                <div className="w-full bg-white/10 rounded-full h-2">
+                                  <div 
+                                    className={`h-2 rounded-full transition-all duration-300 ${
+                                      progress >= 90 ? 'bg-gradient-to-r from-green-500 to-emerald-500' :
+                                      progress >= 70 ? 'bg-gradient-to-r from-blue-500 to-cyan-500' :
+                                      progress >= 50 ? 'bg-gradient-to-r from-yellow-500 to-orange-500' :
+                                      'bg-gradient-to-r from-red-500 to-pink-500'
+                                    }`}
+                                    style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+                                  ></div>
+                                </div>
+                              </div>
+
+                              {/* Notes */}
+                              {activity.notes_amharic && (
+                                <div className="text-xs text-purple-200 mt-2 p-2 bg-white/5 rounded border border-white/10">
+                                  <span className="font-medium">{t('ማስታወሻ', 'Notes')}: </span>
+                                  <span style={{ fontFamily: "'Noto Sans Ethiopic', sans-serif" }}>
+                                    {activity.notes_amharic}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Info Card */}
             <div className="bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-400/30 rounded-xl p-5 backdrop-blur-sm">
