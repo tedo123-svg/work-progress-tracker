@@ -29,6 +29,7 @@ export const translations = {
     mainBranch: 'ክፍለ ከተማ',
     woreda: 'ወረዳ',
     subcity: 'ክፍለ ከተማ',
+    goal: 'ግብ',
   },
 
   // Authentication

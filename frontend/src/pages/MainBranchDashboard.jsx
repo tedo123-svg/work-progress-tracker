@@ -741,7 +741,7 @@ function MainBranchDashboard({ user, onLogout }) {
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm text-purple-300 mb-1">{t('እቅድ', 'Plan')}</div>
+                          <div className="text-sm text-purple-300 mb-1">{t('ግብ', 'Goal')}</div>
                           <div className="text-white font-medium" style={{ fontFamily: "'Noto Sans Ethiopic', sans-serif" }}>
                             {branchReport.plan_title_amharic || branchReport.plan_title}
                           </div>
