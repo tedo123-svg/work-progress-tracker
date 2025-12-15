@@ -17,9 +17,17 @@ function MainBranchDashboard({ user, onLogout }) {
 
   
   // Version identifier for deployment tracking
-  console.log('MainBranchDashboard v3.1 - Backend Validation Fix');
-  const [currentPlan, setCurrentPlan] = useState(null);
-  const [stats, setStats] = useState(null);
+  console.log('MainBranchDashboard v4.0 - Amharic Plans Focus');
+  const [amharicPlans, setAmharicPlans] = useState([]);
+  const [currentAmharicPlan, setCurrentAmharicPlan] = useState(null);
+  const [amharicStats, setAmharicStats] = useState({
+    totalPlans: 0,
+    totalActivities: 0,
+    totalBranches: 0,
+    submittedReports: 0,
+    pendingReports: 0,
+    avgProgress: 0
+  });
   const [loading, setLoading] = useState(true);
 
   const [allReports, setAllReports] = useState([]);
@@ -27,22 +35,78 @@ function MainBranchDashboard({ user, onLogout }) {
   const [showExportMenu, setShowExportMenu] = useState(false);
 
   useEffect(() => {
-    fetchCurrentPlan();
+    fetchAmharicPlans();
     fetchAllReports();
   }, []);
 
-  const fetchCurrentPlan = async () => {
+  const fetchAmharicPlans = async () => {
     try {
-      const planResponse = await monthlyPlanAPI.getCurrent();
-      setCurrentPlan(planResponse.data);
+      console.log('Fetching Amharic plans...');
+      const plansResponse = await annualPlanAPI.getAll();
+      const amharicPlansOnly = (plansResponse.data || []).filter(plan => plan.plan_type === 'amharic_structured');
+      setAmharicPlans(amharicPlansOnly);
       
-      // Fetch stats for current plan
-      if (planResponse.data.id) {
-        const statsResponse = await monthlyPlanAPI.getStats(planResponse.data.id);
-        setStats(statsResponse.data);
+      // Set the most recent plan as current
+      if (amharicPlansOnly.length > 0) {
+        const mostRecent = amharicPlansOnly.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+        setCurrentAmharicPlan(mostRecent);
       }
+      
+      // Calculate stats from Amharic plans
+      let totalActivities = 0;
+      let submittedReports = 0;
+      let pendingReports = 0;
+      let totalProgress = 0;
+      let branchesWithReports = new Set();
+      
+      for (const plan of amharicPlansOnly) {
+        try {
+          // Get activities for each plan
+          const activitiesResponse = await annualPlanAPI.getPlanActivities(plan.id);
+          totalActivities += activitiesResponse.data.length;
+          
+          // Get reports for each plan
+          try {
+            const reportsResponse = await annualPlanAPI.getAmharicActivityReports(plan.id);
+            const reports = reportsResponse.data || [];
+            
+            reports.forEach(report => {
+              branchesWithReports.add(report.branch_name);
+              if (report.status === 'submitted') {
+                submittedReports++;
+              } else {
+                pendingReports++;
+              }
+              
+              // Calculate progress
+              if (report.achievement_percentage) {
+                totalProgress += Number(report.achievement_percentage) || 0;
+              }
+            });
+          } catch (err) {
+            // No reports yet for this plan
+            pendingReports += activitiesResponse.data.length;
+          }
+        } catch (err) {
+          console.error('Error fetching activities for plan:', plan.id, err);
+        }
+      }
+      
+      const avgProgress = submittedReports > 0 ? totalProgress / submittedReports : 0;
+      
+      setAmharicStats({
+        totalPlans: amharicPlansOnly.length,
+        totalActivities,
+        totalBranches: branchesWithReports.size,
+        submittedReports,
+        pendingReports,
+        avgProgress: Math.round(avgProgress * 100) / 100
+      });
+      
     } catch (error) {
-      console.error('Failed to fetch current plan:', error);
+      console.error('Failed to fetch Amharic plans:', error);
+      setAmharicPlans([]);
+      setCurrentAmharicPlan(null);
     } finally {
       setLoading(false);
     }
@@ -307,7 +371,7 @@ function MainBranchDashboard({ user, onLogout }) {
               <Sparkles className="text-yellow-400" size={32} />
               {t('ክፍለ ከተማ ዳሽቦርድ', 'Sub-city Dashboard')}
             </h1>
-            <p className="text-purple-200">{t('የወርሃዊ እቅድን ያስተዳድሩ እና በሁሉም ቅርንጫፎች ላይ እድገትን ይከታተሉ', 'Manage monthly plan and monitor progress across all branches')}</p>
+            <p className="text-purple-200">{t('የአማርኛ እቅዶችን ያስተዳድሩ እና በሁሉም ወረዳዎች ላይ እድገትን ይከታተሉ', 'Manage Amharic plans and monitor progress across all woredas')}</p>
           </div>
           
           <div className="flex gap-3">
@@ -346,29 +410,33 @@ function MainBranchDashboard({ user, onLogout }) {
             <div className="inline-block w-16 h-16 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
             <p className="text-purple-200 mt-4">{t('እቅድ በመጫን ላይ...', 'Loading plan...')}</p>
           </div>
-        ) : !currentPlan ? (
+        ) : amharicPlans.length === 0 ? (
           <div className="glass rounded-3xl shadow-2xl p-16 text-center backdrop-blur-xl border border-white/20 animate-fade-in">
             <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
-              <RefreshCw size={48} className="text-white animate-spin" />
+              <FileText size={48} className="text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3">{t('የወር እቅድ በመፍጠር ላይ...', 'Creating Monthly Plan...')}</h3>
+            <h3 className="text-2xl font-bold text-white mb-3">{t('ምንም የአማርኛ እቅዶች የሉም', 'No Amharic Plans Available')}</h3>
             <p className="text-purple-200 max-w-md mx-auto">
-              {t('ስርዓቱ በራስ-ሰር የወርሃዊ እቅድ እየፈጠረ ነው። እባክዎ ይጠብቁ...', 'The system is automatically creating the monthly plan. Please wait...')}
+              {t('የአማርኛ እቅዶች ለመፍጠር ከላይ ያለውን አረንጓዴ ቁልፍ ይጫኑ', 'Click the green button above to create Amharic plans')}
             </p>
           </div>
         ) : (
           <div className="space-y-6 animate-fade-in">
-            {/* Current Month Plan Card */}
+            {/* Current Amharic Plan Overview */}
             <div className="glass rounded-2xl shadow-xl p-6 backdrop-blur-xl border border-white/20">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-                    <Calendar size={24} className="text-white" />
+                    <FileText size={24} className="text-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-white">{t('የአሁኑ ወር እቅድ', 'Current Month Plan')}</h2>
+                    <h2 className="text-2xl font-bold text-white">{t('የአማርኛ እቅዶች አጠቃላይ እይታ', 'Amharic Plans Overview')}</h2>
                     <p className="text-purple-200">
-                      {getEthiopianMonthName(currentPlan.month, language === 'am' ? 'amharic' : 'english')} {currentPlan.year}
+                      {currentAmharicPlan ? (
+                        <span style={{ fontFamily: "'Noto Sans Ethiopic', sans-serif" }}>
+                          {currentAmharicPlan.plan_title_amharic || currentAmharicPlan.title}
+                        </span>
+                      ) : t('የአማርኛ እቅዶች ሁኔታ', 'Amharic Plans Status')}
                     </p>
                   </div>
                 </div>
@@ -380,26 +448,21 @@ function MainBranchDashboard({ user, onLogout }) {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-sm rounded-xl p-4 border border-green-400/30">
                   <div className="flex items-center gap-2 text-green-300 text-sm mb-1">
-                    <Target size={16} />
-                    {t('ወርሃዊ ዒላማ', 'Monthly Target')}
+                    <FileText size={16} />
+                    {t('ጠቅላላ እቅዶች', 'Total Plans')}
                   </div>
                   <div className="text-3xl font-bold text-white">
-                    {currentPlan.target_amount?.toLocaleString()}
+                    {amharicStats.totalPlans}
                   </div>
                 </div>
 
                 <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-4 border border-blue-400/30">
                   <div className="flex items-center gap-2 text-blue-300 text-sm mb-1">
-                    <Calendar size={16} />
-                    {t('የመጨረሻ ቀን', 'Deadline')}
+                    <Target size={16} />
+                    {t('ጠቅላላ እንቅስቃሴዎች', 'Total Activities')}
                   </div>
-                  <div className="text-xl font-bold text-white">
-                    {formatEthiopianDeadline(currentPlan.deadline, currentPlan.month, language === 'am' ? 'amharic' : 'english')}
-                  </div>
-                  <div className="text-xs text-blue-200 mt-1">
-                    {getDaysUntilDeadline(currentPlan.deadline, currentPlan.month) > 0 
-                      ? `${getDaysUntilDeadline(currentPlan.deadline, currentPlan.month)} ${t('ቀናት ቀርተዋል', 'days left')}`
-                      : t('ጊዜው አልፏል', 'Deadline passed')}
+                  <div className="text-3xl font-bold text-white">
+                    {amharicStats.totalActivities}
                   </div>
                 </div>
 
@@ -409,31 +472,29 @@ function MainBranchDashboard({ user, onLogout }) {
                     {t('አማካይ እድገት', 'Avg Progress')}
                   </div>
                   <div className="text-3xl font-bold text-white">
-                    {stats ? (Number(stats.avg_progress) || 0).toFixed(1) : '0.0'}%
+                    {amharicStats.avgProgress.toFixed(1)}%
                   </div>
                 </div>
               </div>
 
-              {stats && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                    <div className="text-purple-300 text-sm mb-1">{t('ጠቅላላ ሪፖርቶች', 'Total Reports')}</div>
-                    <div className="text-2xl font-bold text-white">{stats.total_reports || 0}</div>
-                  </div>
-                  <div className="bg-green-500/10 rounded-xl p-4 border border-green-400/20">
-                    <div className="text-green-300 text-sm mb-1">{t('ገብቷል', 'Submitted')}</div>
-                    <div className="text-2xl font-bold text-white">{stats.submitted_reports || 0}</div>
-                  </div>
-                  <div className="bg-yellow-500/10 rounded-xl p-4 border border-yellow-400/20">
-                    <div className="text-yellow-300 text-sm mb-1">{t('በመጠባበቅ ላይ', 'Pending')}</div>
-                    <div className="text-2xl font-bold text-white">{stats.pending_reports || 0}</div>
-                  </div>
-                  <div className="bg-red-500/10 rounded-xl p-4 border border-red-400/20">
-                    <div className="text-red-300 text-sm mb-1">{t('ዘግይቷል', 'Late')}</div>
-                    <div className="text-2xl font-bold text-white">{stats.late_reports || 0}</div>
-                  </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                  <div className="text-purple-300 text-sm mb-1">{t('ተሳታፊ ወረዳዎች', 'Participating Woredas')}</div>
+                  <div className="text-2xl font-bold text-white">{amharicStats.totalBranches}</div>
                 </div>
-              )}
+                <div className="bg-green-500/10 rounded-xl p-4 border border-green-400/20">
+                  <div className="text-green-300 text-sm mb-1">{t('የተላኩ ሪፖርቶች', 'Submitted Reports')}</div>
+                  <div className="text-2xl font-bold text-white">{amharicStats.submittedReports}</div>
+                </div>
+                <div className="bg-yellow-500/10 rounded-xl p-4 border border-yellow-400/20">
+                  <div className="text-yellow-300 text-sm mb-1">{t('በመጠባበቅ ላይ', 'Pending Reports')}</div>
+                  <div className="text-2xl font-bold text-white">{amharicStats.pendingReports}</div>
+                </div>
+                <div className="bg-blue-500/10 rounded-xl p-4 border border-blue-400/20">
+                  <div className="text-blue-300 text-sm mb-1">{t('ጠቅላላ ሪፖርቶች', 'Total Reports')}</div>
+                  <div className="text-2xl font-bold text-white">{amharicStats.submittedReports + amharicStats.pendingReports}</div>
+                </div>
+              </div>
             </div>
 
             {/* Performance Summary Section */}
@@ -600,10 +661,10 @@ function MainBranchDashboard({ user, onLogout }) {
                 <div>
                   <h2 className="text-xl font-bold text-white flex items-center gap-2">
                     <Users size={24} />
-                    {t('የአሁኑ ወር ሪፖርቶች', 'Current Month Reports')}
+                    {t('የአማርኛ እቅድ ሪፖርቶች', 'Amharic Plan Reports')}
                   </h2>
                   <p className="text-sm text-purple-300 mt-1">
-                    {t('የአሁኑ ወር የቅርንጫፍ ሪፖርቶች', 'Branch reports for current month')}
+                    {t('የወረዳዎች የአማርኛ እቅድ ሪፖርቶች', 'Woreda Amharic plan reports')}
                   </p>
                 </div>
                 <button
@@ -625,9 +686,9 @@ function MainBranchDashboard({ user, onLogout }) {
                   <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <Calendar size={32} className="text-white" />
                   </div>
-                  <p className="text-white font-semibold mb-2">{t('የአሁኑ ወር ሪፖርቶች የሉም', 'No Current Month Reports')}</p>
+                  <p className="text-white font-semibold mb-2">{t('የአማርኛ እቅድ ሪፖርቶች የሉም', 'No Amharic Plan Reports')}</p>
                   <p className="text-purple-200 text-sm">
-                    {t('የአሁኑ ወር ሪፖርቶች አልተገኙም', 'No current month reports found')}
+                    {t('የአማርኛ እቅድ ሪፖርቶች አልተገኙም', 'No Amharic plan reports found')}
                   </p>
                 </div>
               ) : (

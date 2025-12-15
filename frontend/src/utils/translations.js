@@ -183,6 +183,20 @@ export const translations = {
     woredaUsers: 'የወረዳ ተጠቃሚዎች',
   },
 
+  // Amharic Plans
+  amharicPlans: {
+    overview: 'የአማርኛ እቅዶች አጠቃላይ እይታ',
+    totalPlans: 'ጠቅላላ እቅዶች',
+    totalActivities: 'ጠቅላላ እንቅስቃሴዎች',
+    participatingWoredas: 'ተሳታፊ ወረዳዎች',
+    submittedReports: 'የተላኩ ሪፖርቶች',
+    amharicPlanReports: 'የአማርኛ እቅድ ሪፖርቶች',
+    woredaAmharicReports: 'የወረዳዎች የአማርኛ እቅድ ሪፖርቶች',
+    noAmharicReports: 'የአማርኛ እቅድ ሪፖርቶች የሉም',
+    noAmharicReportsFound: 'የአማርኛ እቅድ ሪፖርቶች አልተገኙም',
+    manageAmharicPlans: 'የአማርኛ እቅዶችን ያስተዳድሩ እና በሁሉም ወረዳዎች ላይ እድገትን ይከታተሉ',
+  },
+
   // Months (Ethiopian Government Fiscal Year)
   months: {
     1: 'ሐምሌ',
