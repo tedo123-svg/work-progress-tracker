@@ -129,6 +129,10 @@ function MainBranchDashboard({ user, onLogout }) {
       console.log('Total activity reports received:', response.data.length);
       console.log('Raw response data:', response.data);
       
+      if (response.data.length === 0) {
+        console.log('No Amharic activity reports found - this is why Performance Summary shows 0');
+      }
+      
       // Ensure response.data is an array
       const responseData = Array.isArray(response.data) ? response.data : [];
       
@@ -289,12 +293,23 @@ function MainBranchDashboard({ user, onLogout }) {
   // Prepare chart data for grouped Amharic activity reports
   const chartData = useMemo(() => {
     try {
+      console.log('=== CHART DATA CALCULATION ===');
+      console.log('allReports:', allReports);
+      console.log('allReports length:', allReports?.length);
+      
       if (!allReports || !Array.isArray(allReports)) {
         console.warn('allReports is not an array:', allReports);
         return [];
       }
       
+      if (allReports.length === 0) {
+        console.log('No reports available for chart data');
+        return [];
+      }
+      
       const processedData = allReports.map((branchReport, index) => {
+        console.log(`Processing branch report ${index}:`, branchReport);
+        
         if (!branchReport || typeof branchReport !== 'object') {
           console.warn(`Invalid branchReport at index ${index}:`, branchReport);
           return {
@@ -306,6 +321,7 @@ function MainBranchDashboard({ user, onLogout }) {
         }
         
         const safeBranchName = transformBranchName(branchReport.branch_name, language) || transformBranchName(`Branch ${index + 1}`, language);
+        console.log(`Processing branch: ${safeBranchName}`);
         
         if (!branchReport.activities || !Array.isArray(branchReport.activities)) {
           console.warn(`Invalid branchReport activities at index ${index}:`, branchReport);
@@ -319,17 +335,40 @@ function MainBranchDashboard({ user, onLogout }) {
         
         let totalAchieved = 0;
         let totalTarget = 0;
+        let totalProgressPercentage = 0;
+        let validActivities = 0;
         
         branchReport.activities.forEach((activity, actIndex) => {
           if (activity && typeof activity === 'object') {
-            totalAchieved += Number(activity.achieved_number) || 0;
-            totalTarget += Number(activity.target_number) || 0;
+            // Handle both field name variations (achieved_number vs actual_achievement)
+            const achieved = Number(activity.actual_achievement || activity.achieved_number) || 0;
+            const target = Number(activity.target_number) || 0;
+            const activityProgress = Number(activity.achievement_percentage) || 0;
+            
+            totalAchieved += achieved;
+            totalTarget += target;
+            
+            // If we have achievement_percentage, use it for more accurate calculation
+            if (activityProgress > 0) {
+              totalProgressPercentage += activityProgress;
+              validActivities++;
+            }
+            
+            console.log(`  Activity ${activity.activity_number}: achieved=${achieved}, target=${target}, progress=${activityProgress}%`);
           } else {
             console.warn(`Invalid activity at index ${actIndex} for branch ${safeBranchName}:`, activity);
           }
         });
         
-        const progress = totalTarget > 0 ? Math.round((totalAchieved / totalTarget) * 100) : 0;
+        // Use average of achievement percentages if available, otherwise calculate from totals
+        let progress = 0;
+        if (validActivities > 0) {
+          progress = Math.round(totalProgressPercentage / validActivities);
+        } else if (totalTarget > 0) {
+          progress = Math.round((totalAchieved / totalTarget) * 100);
+        }
+        
+        console.log(`Branch ${safeBranchName}: achieved=${totalAchieved}, target=${totalTarget}, progress=${progress}%`);
         
         return {
           name: safeBranchName,
@@ -339,12 +378,16 @@ function MainBranchDashboard({ user, onLogout }) {
         };
       });
       
-      return processedData.sort((a, b) => (b.progress || 0) - (a.progress || 0));
+      const sortedData = processedData.sort((a, b) => (b.progress || 0) - (a.progress || 0));
+      console.log('Final chart data:', sortedData);
+      console.log('=== END CHART DATA CALCULATION ===');
+      
+      return sortedData;
     } catch (error) {
       console.error('Error processing chart data:', error);
       return [];
     }
-  }, [allReports]);
+  }, [allReports, language]);
 
   const gradeDistribution = chartData.reduce((acc, branch) => {
     const gradeInfo = calculateGrade(branch.progress);
@@ -498,7 +541,7 @@ function MainBranchDashboard({ user, onLogout }) {
             </div>
 
             {/* Performance Summary Section */}
-            {allReports.length > 0 && (
+            {allReports.length > 0 ? (
               <div className="glass rounded-2xl shadow-xl p-6 backdrop-blur-xl border border-white/20">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold text-white flex items-center gap-2">
@@ -653,9 +696,23 @@ function MainBranchDashboard({ user, onLogout }) {
                   </div>
                 </div>
               </div>
+            ) : (
+              /* No Reports Message */
+              <div className="glass rounded-2xl shadow-xl p-8 backdrop-blur-xl border border-white/20 text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <BarChart3 size={32} className="text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">{t('የአፈጻጸም ማጠቃለያ', 'Performance Summary')}</h3>
+                <p className="text-purple-200 mb-4">
+                  {t('performanceSummaryWaiting', 'Performance summary will appear when woredas submit reports')}
+                </p>
+                <div className="text-sm text-purple-300">
+                  {t('chartsWillAppear', 'Charts and statistics will appear here after woredas submit Amharic plan reports')}
+                </div>
+              </div>
             )}
 
-            {/* Tahsas Month Branch Reports */}
+            {/* Amharic Plan Reports */}
             <div className="glass rounded-2xl shadow-xl backdrop-blur-xl border border-white/20">
               <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
                 <div>

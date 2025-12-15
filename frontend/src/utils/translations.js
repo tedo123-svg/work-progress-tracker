@@ -195,6 +195,8 @@ export const translations = {
     noAmharicReports: 'የአማርኛ እቅድ ሪፖርቶች የሉም',
     noAmharicReportsFound: 'የአማርኛ እቅድ ሪፖርቶች አልተገኙም',
     manageAmharicPlans: 'የአማርኛ እቅዶችን ያስተዳድሩ እና በሁሉም ወረዳዎች ላይ እድገትን ይከታተሉ',
+    performanceSummaryWaiting: 'የአፈጻጸም ማጠቃለያ ለማየት ወረዳዎች ሪፖርት ማስገባት አለባቸው',
+    chartsWillAppear: 'ወረዳዎች የአማርኛ እቅድ ሪፖርቶችን ካስገቡ በኋላ እዚህ ይታያል',
   },
 
   // Months (Ethiopian Government Fiscal Year)
