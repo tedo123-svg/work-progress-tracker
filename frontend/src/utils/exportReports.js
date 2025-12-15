@@ -465,7 +465,7 @@ export const exportAmharicPlanToPDF = (plan, activities, language = 'am') => {
     doc.text(wrappedSummary, 14, currentY);
     currentY += (wrappedSummary.length * 6) + 15;
     
-    // Activities Section - Structured Format
+    // Activities Section - Narrative Format
     doc.setFontSize(11);
     activities.forEach((activity, index) => {
       // Check if we need a new page
@@ -483,31 +483,16 @@ export const exportAmharicPlanToPDF = (plan, activities, language = 'am') => {
       doc.text(wrappedHeader, 14, currentY);
       currentY += (wrappedHeader.length * 6) + 8;
       
-      // Create table structure for targets and achievements
-      const tableData = [
-        ['ዒላማ', 'ከዒላማ', 'መቶኛ'],
-        [activity.target_number.toString(), activity.target_number.toString(), '100%']
-      ];
+      // Create narrative format for target information
+      doc.setFontSize(10);
+      const targetNarrative = `ዒላማ ${activity.target_number} ከዒላማ ${activity.target_number} 100%`;
       
-      // Draw simple table
-      const startX = 20;
-      const colWidths = [40, 40, 30];
-      const rowHeight = 8;
+      // Add indentation for the target narrative
+      doc.text(targetNarrative, 20, currentY);
+      currentY += 10;
       
-      tableData.forEach((row, rowIndex) => {
-        let x = startX;
-        row.forEach((cell, colIndex) => {
-          // Draw cell border
-          doc.rect(x, currentY - 5, colWidths[colIndex], rowHeight);
-          
-          // Add cell text
-          doc.text(cell, x + 2, currentY);
-          x += colWidths[colIndex];
-        });
-        currentY += rowHeight;
-      });
-      
-      currentY += 10; // Space between activities
+      // Add spacing between activities
+      currentY += 5;
     });
     
     // Footer
@@ -580,7 +565,7 @@ export const exportAmharicReportsToPDF = (reports, plan, month, year, language =
       activityGroups[activityKey].reports.push(report);
     });
     
-    // Process each activity in the structured format
+    // Process each activity in narrative format
     Object.values(activityGroups).forEach((activityGroup, index) => {
       // Check if we need a new page
       if (currentY > 220) {
@@ -598,7 +583,7 @@ export const exportAmharicReportsToPDF = (reports, plan, month, year, language =
       doc.text(wrappedHeader, 14, currentY);
       currentY += (wrappedHeader.length * 6) + 8;
       
-      // Create structured table for each branch
+      // Create narrative format for each branch
       activityGroup.reports.forEach((report, reportIndex) => {
         if (currentY > 250) {
           doc.addPage();
@@ -608,58 +593,37 @@ export const exportAmharicReportsToPDF = (reports, plan, month, year, language =
           currentY = 25;
         }
         
-        // Branch data in table format
-        const branchData = [
-          ['ዒላማ', 'ከዒላማ', 'መቶኛ'],
-          [
-            (Number(report.target_number) || 0).toLocaleString(),
-            (Number(report.actual_achievement) || 0).toLocaleString(),
-            `${(Number(report.achievement_percentage) || 0).toFixed(1)}%`
-          ]
-        ];
-        
-        // Branch name header
+        // Branch narrative format
         doc.setFontSize(10);
-        doc.text(`${report.branch_name}:`, 20, currentY);
+        const target = (Number(report.target_number) || 0).toLocaleString();
+        const achieved = (Number(report.actual_achievement) || 0).toLocaleString();
+        const percentage = (Number(report.achievement_percentage) || 0).toFixed(1);
+        
+        // Create narrative text like: "ዒላማ 1 ከዒላማ 1 100%"
+        const narrativeText = `ዒላማ ${target} ከዒላማ ${achieved} ${percentage}%`;
+        
+        // Add indentation for sub-items
+        doc.text(narrativeText, 20, currentY);
         currentY += 8;
-        
-        // Draw table
-        const startX = 25;
-        const colWidths = [40, 50, 30];
-        const rowHeight = 6;
-        
-        branchData.forEach((row, rowIndex) => {
-          let x = startX;
-          row.forEach((cell, colIndex) => {
-            // Draw cell border
-            doc.setLineWidth(0.1);
-            doc.rect(x, currentY - 4, colWidths[colIndex], rowHeight);
-            
-            // Add cell text
-            doc.setFontSize(9);
-            if (rowIndex === 0) {
-              doc.setFont(useAmharic ? 'GeezDigital_V1' : 'helvetica', 'bold');
-            } else {
-              doc.setFont(useAmharic ? 'GeezDigital_V1' : 'helvetica', 'normal');
-            }
-            doc.text(cell, x + 2, currentY);
-            x += colWidths[colIndex];
-          });
-          currentY += rowHeight;
-        });
-        
-        currentY += 5; // Space between branches
       });
       
-      // Activity summary
+      // Activity summary in narrative format
       const activityTotal = activityGroup.reports.reduce((sum, r) => sum + (Number(r.actual_achievement) || 0), 0);
       const activityTarget = activityGroup.reports.reduce((sum, r) => sum + (Number(r.target_number) || 0), 0);
       const activityPercentage = activityTarget > 0 ? ((activityTotal / activityTarget) * 100).toFixed(1) : '0.0';
       
+      // Add spacing before summary
+      currentY += 5;
+      
+      // Summary in narrative format
       doc.setFontSize(10);
-      doc.setFont(useAmharic ? 'GeezDigital_V1' : 'helvetica', 'bold');
-      doc.text(`ጠቅላላ: ዒላማ ${activityTarget.toLocaleString()} ከዒላማ ${activityTotal.toLocaleString()} ${activityPercentage}%`, 20, currentY);
-      currentY += 15;
+      doc.setFont(useAmharic ? 'GeezDigital_V1' : 'helvetica', 'normal');
+      
+      // Create summary narrative like the image format
+      const summaryNarrative = `ዒላማ ${activityTarget.toLocaleString()} ከዒላማ ${activityTotal.toLocaleString()} ${activityPercentage}%በላይ`;
+      const wrappedSummary = doc.splitTextToSize(summaryNarrative, 170);
+      doc.text(wrappedSummary, 20, currentY);
+      currentY += (wrappedSummary.length * 6) + 10;
     });
     
     // Footer
@@ -898,7 +862,7 @@ export const exportAmharicReportsToExcel = (reports, plan, month, year, language
     
     structuredData.push({}); // Empty row
     
-    // Add each activity in structured format
+    // Add each activity in narrative format
     Object.values(activityGroups).forEach(activityGroup => {
       // Activity header
       structuredData.push({
@@ -908,34 +872,36 @@ export const exportAmharicReportsToExcel = (reports, plan, month, year, language
         'D': ''
       });
       
-      // Table headers
-      structuredData.push({
-        'A': 'ቅርንጫፍ',
-        'B': 'ዒላማ',
-        'C': 'ከዒላማ',
-        'D': 'መቶኛ'
-      });
-      
-      // Branch data
+      // Branch data in narrative format
       activityGroup.reports.forEach(report => {
+        const target = (Number(report.target_number) || 0).toLocaleString();
+        const achieved = (Number(report.actual_achievement) || 0).toLocaleString();
+        const percentage = (Number(report.achievement_percentage) || 0).toFixed(1);
+        
+        // Create narrative format: "ዒላማ 1 ከዒላማ 1 100%"
+        const narrativeText = `ዒላማ ${target} ከዒላማ ${achieved} ${percentage}%`;
+        
         structuredData.push({
-          'A': report.branch_name || '',
-          'B': (Number(report.target_number) || 0).toLocaleString(),
-          'C': (Number(report.actual_achievement) || 0).toLocaleString(),
-          'D': `${(Number(report.achievement_percentage) || 0).toFixed(1)}%`
+          'A': narrativeText,
+          'B': '',
+          'C': '',
+          'D': ''
         });
       });
       
-      // Activity summary
+      // Activity summary in narrative format
       const activityTotal = activityGroup.reports.reduce((sum, r) => sum + (Number(r.actual_achievement) || 0), 0);
       const activityTarget = activityGroup.reports.reduce((sum, r) => sum + (Number(r.target_number) || 0), 0);
       const activityPercentage = activityTarget > 0 ? ((activityTotal / activityTarget) * 100).toFixed(1) : '0.0';
       
+      // Summary narrative
+      const summaryNarrative = `ዒላማ ${activityTarget.toLocaleString()} ከዒላማ ${activityTotal.toLocaleString()} ${activityPercentage}%በላይ`;
+      
       structuredData.push({
-        'A': 'ጠቅላላ',
-        'B': activityTarget.toLocaleString(),
-        'C': activityTotal.toLocaleString(),
-        'D': `${activityPercentage}%`
+        'A': summaryNarrative,
+        'B': '',
+        'C': '',
+        'D': ''
       });
       
       structuredData.push({}); // Empty row between activities
@@ -1195,35 +1161,20 @@ export const exportAmharicReportsToWord = async (reports, plan, month, year, lan
         spacing: { after: 200 }
       }));
       
-      // Table for this activity
-      const tableRows = [
-        // Header row
-        new TableRow({
-          children: [
-            new TableCell({ children: [new Paragraph({ text: 'ቅርንጫፍ', bold: true })] }),
-            new TableCell({ children: [new Paragraph({ text: 'ተሳካ', bold: true })] }),
-            new TableCell({ children: [new Paragraph({ text: 'መቶኛ', bold: true })] }),
-            new TableCell({ children: [new Paragraph({ text: 'ሁኔታ', bold: true })] })
-          ]
-        }),
-        // Data rows
-        ...activityGroup.reports.map(report => new TableRow({
-          children: [
-            new TableCell({ children: [new Paragraph(report.branch_name || '')] }),
-            new TableCell({ children: [new Paragraph((Number(report.actual_achievement) || 0).toLocaleString())] }),
-            new TableCell({ children: [new Paragraph(`${(Number(report.achievement_percentage) || 0).toFixed(1)}%`)] }),
-            new TableCell({ children: [new Paragraph(
-              report.status === 'submitted' ? 'ገብቷል' :
-              report.status === 'late' ? 'ዘግይቷል' : 'በመጠባበቅ ላይ'
-            )] })
-          ]
-        }))
-      ];
-      
-      children.push(new Table({
-        width: { size: 100, type: WidthType.PERCENTAGE },
-        rows: tableRows
-      }));
+      // Add narrative format for each branch
+      activityGroup.reports.forEach(report => {
+        const target = (Number(report.target_number) || 0).toLocaleString();
+        const achieved = (Number(report.actual_achievement) || 0).toLocaleString();
+        const percentage = (Number(report.achievement_percentage) || 0).toFixed(1);
+        
+        // Create narrative text
+        const narrativeText = `ዒላማ ${target} ከዒላማ ${achieved} ${percentage}%`;
+        
+        children.push(new Paragraph({
+          text: narrativeText,
+          spacing: { before: 100, after: 100 }
+        }));
+      });
       
       // Summary for this activity
       const totalAchieved = activityGroup.reports.reduce((sum, r) => sum + (Number(r.actual_achievement) || 0), 0);
