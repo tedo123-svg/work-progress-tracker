@@ -17,6 +17,15 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Helper function to check if user can access main branch features
+  const canAccessMainBranchFeatures = (user) => {
+    return user?.role === 'main_branch' || 
+           user?.role === 'organization_sector' || 
+           user?.role === 'information_sector' || 
+           user?.role === 'operation_sector' || 
+           user?.role === 'peace_value_sector';
+  };
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
@@ -59,7 +68,7 @@ function App() {
             user ? (
               user.role === 'admin' ? (
                 <Navigate to="/admin" replace />
-              ) : user.role === 'main_branch' ? (
+              ) : canAccessMainBranchFeatures(user) ? (
                 <MainBranchDashboard user={user} onLogout={handleLogout} />
               ) : (
                 <BranchUserDashboard user={user} onLogout={handleLogout} />
@@ -79,17 +88,20 @@ function App() {
         
         <Route 
           path="/create-amharic-plan" 
-          element={user?.role === 'main_branch' ? <CreateAmharicPlan user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
+          element={canAccessMainBranchFeatures(user) ? 
+                   <CreateAmharicPlan user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
         />
         
         <Route 
           path="/edit-amharic-plan/:id" 
-          element={user?.role === 'main_branch' ? <EditAmharicPlan user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
+          element={canAccessMainBranchFeatures(user) ? 
+                   <EditAmharicPlan user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
         />
         
         <Route 
           path="/manage-amharic-plans" 
-          element={user?.role === 'main_branch' ? <ManageAmharicPlans user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
+          element={canAccessMainBranchFeatures(user) ? 
+                   <ManageAmharicPlans user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
         />
         
         <Route 
@@ -104,7 +116,8 @@ function App() {
         
         <Route 
           path="/view-amharic-reports" 
-          element={user?.role === 'main_branch' ? <ViewAmharicReports user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
+          element={canAccessMainBranchFeatures(user) ? 
+                   <ViewAmharicReports user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
         />
       </Routes>
     </BrowserRouter>

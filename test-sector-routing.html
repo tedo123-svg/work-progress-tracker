@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sector Routing Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-case { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .pass { background-color: #d4edda; }
+        .fail { background-color: #f8d7da; }
+    </style>
+</head>
+<body>
+    <h1>Sector Admin Routing Test</h1>
+    
+    <div id="test-results"></div>
+    
+    <script>
+        // Test function to check if user roles are properly handled
+        function canAccessMainBranchFeatures(user) {
+            return user?.role === 'main_branch' || 
+                   user?.role === 'organization_sector' || 
+                   user?.role === 'information_sector' || 
+                   user?.role === 'operation_sector' || 
+                   user?.role === 'peace_value_sector';
+        }
+        
+        // Test cases
+        const testCases = [
+            { user: { role: 'main_branch' }, expected: true, description: 'Main branch should access features' },
+            { user: { role: 'organization_sector' }, expected: true, description: 'Organization sector should access features' },
+            { user: { role: 'information_sector' }, expected: true, description: 'Information sector should access features' },
+            { user: { role: 'operation_sector' }, expected: true, description: 'Operation sector should access features' },
+            { user: { role: 'peace_value_sector' }, expected: true, description: 'Peace & Value sector should access features' },
+            { user: { role: 'branch_user' }, expected: false, description: 'Branch user should NOT access features' },
+            { user: { role: 'admin' }, expected: false, description: 'Admin should NOT access features (has own dashboard)' },
+            { user: null, expected: false, description: 'Null user should NOT access features' },
+        ];
+        
+        const resultsDiv = document.getElementById('test-results');
+        
+        testCases.forEach((testCase, index) => {
+            const result = canAccessMainBranchFeatures(testCase.user);
+            const passed = result === testCase.expected;
+            
+            const testDiv = document.createElement('div');
+            testDiv.className = `test-case ${passed ? 'pass' : 'fail'}`;
+            testDiv.innerHTML = `
+                <strong>Test ${index + 1}:</strong> ${testCase.description}<br>
+                <strong>User Role:</strong> ${testCase.user?.role || 'null'}<br>
+                <strong>Expected:</strong> ${testCase.expected}<br>
+                <strong>Actual:</strong> ${result}<br>
+                <strong>Status:</strong> ${passed ? '✅ PASS' : '❌ FAIL'}
+            `;
+            
+            resultsDiv.appendChild(testDiv);
+        });
+        
+        // Summary
+        const passedTests = testCases.filter((testCase, index) => 
+            canAccessMainBranchFeatures(testCase.user) === testCase.expected
+        ).length;
+        
+        const summaryDiv = document.createElement('div');
+        summaryDiv.style.marginTop = '20px';
+        summaryDiv.style.padding = '15px';
+        summaryDiv.style.backgroundColor = passedTests === testCases.length ? '#d4edda' : '#f8d7da';
+        summaryDiv.innerHTML = `
+            <h2>Test Summary</h2>
+            <p><strong>Passed:</strong> ${passedTests}/${testCases.length}</p>
+            <p><strong>Status:</strong> ${passedTests === testCases.length ? '✅ ALL TESTS PASSED' : '❌ SOME TESTS FAILED'}</p>
+        `;
+        
+        resultsDiv.appendChild(summaryDiv);
+    </script>
+</body>
+</html>
