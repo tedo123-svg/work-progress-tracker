@@ -12,8 +12,8 @@ function Navbar({ user, onLogout }) {
       <div className="container mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform border-2 border-white/20">
-              <FileText size={24} className="text-white" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+              <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain rounded-xl" />
             </div>
             <div>
               <span className="text-xl font-bold text-white block">{t('ዘመናዊ እቅድ እና ሪፖርት', 'Modern Plan and Report')}</span>
