@@ -19,10 +19,10 @@ CREATE INDEX IF NOT EXISTS idx_annual_plans_sector ON annual_plans(sector);
 -- Step 5: Insert the 4 sector admin users
 -- Password hash for 'sector123' (bcrypt with salt rounds 10)
 INSERT INTO users (username, password, role, branch_name, email, sector) VALUES
-('organization_admin', '$2b$10$rQJ8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8Y', 'organization_sector', 'Organization Sector', 'organization@example.com', 'organization'),
-('information_admin', '$2b$10$rQJ8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8Y', 'information_sector', 'Information Sector', 'information@example.com', 'information'),
-('operation_admin', '$2b$10$rQJ8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8Y', 'operation_sector', 'Operation Sector', 'operation@example.com', 'operation'),
-('peace_value_admin', '$2b$10$rQJ8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8YQZ9X8Y', 'peace_value_sector', 'Peace and Value Sector', 'peacevalue@example.com', 'peace_value')
+('organization_admin', '$2b$10$lmas9baRwAaHv9ayZIQ0POHDrUDPwU6qwCi1OYByf9F4ZepzADzeG', 'organization_sector', 'Organization Sector', 'organization@example.com', 'organization'),
+('information_admin', '$2b$10$lmas9baRwAaHv9ayZIQ0POHDrUDPwU6qwCi1OYByf9F4ZepzADzeG', 'information_sector', 'Information Sector', 'information@example.com', 'information'),
+('operation_admin', '$2b$10$lmas9baRwAaHv9ayZIQ0POHDrUDPwU6qwCi1OYByf9F4ZepzADzeG', 'operation_sector', 'Operation Sector', 'operation@example.com', 'operation'),
+('peace_value_admin', '$2b$10$lmas9baRwAaHv9ayZIQ0POHDrUDPwU6qwCi1OYByf9F4ZepzADzeG', 'peace_value_sector', 'Peace and Value Sector', 'peacevalue@example.com', 'peace_value')
 ON CONFLICT (username) DO UPDATE SET
   role = EXCLUDED.role,
   branch_name = EXCLUDED.branch_name,

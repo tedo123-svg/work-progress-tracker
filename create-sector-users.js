@@ -1,9 +1,9 @@
-import bcrypt from 'bcrypt';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import bcrypt from 'bcryptjs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import dotenv from 'dotenv';
+
+// Load environment variables from backend directory
+dotenv.config({ path: './backend/.env' });
 
 // Import the database connection
 import('./backend/src/database/db.js').then(async (dbModule) => {
