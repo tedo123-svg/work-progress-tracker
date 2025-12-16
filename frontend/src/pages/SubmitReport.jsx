@@ -152,10 +152,12 @@ function SubmitReport({ user, onLogout }) {
                 type="number"
                 value={formData.achievedAmount}
                 onChange={(e) => setFormData({ ...formData, achievedAmount: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${report.submitted_at ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 placeholder="0"
                 step="0.01"
                 required
+                disabled={report.submitted_at}
+                readOnly={report.submitted_at}
               />
             </div>
 
@@ -167,9 +169,11 @@ function SubmitReport({ user, onLogout }) {
                 type="number"
                 value={formData.achievedUnits}
                 onChange={(e) => setFormData({ ...formData, achievedUnits: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${report.submitted_at ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 placeholder="0"
                 required
+                disabled={report.submitted_at}
+                readOnly={report.submitted_at}
               />
             </div>
 
@@ -180,37 +184,55 @@ function SubmitReport({ user, onLogout }) {
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${report.submitted_at ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 rows="4"
                 placeholder={t('ስለዚህ ወር እድገት ማስታወሻ ያክሉ...', "Add any notes about this month's progress...")}
+                disabled={report.submitted_at}
+                readOnly={report.submitted_at}
               />
             </div>
 
             {report.submitted_at && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
-                  {t('ቀደም ብሎ ገብቷል በ', 'Previously submitted on')} {new Date(report.submitted_at).toLocaleString()}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-sm text-green-800 font-semibold">
+                  ✅ {t('ቀደም ብሎ ገብቷል በ', 'Already submitted on')} {new Date(report.submitted_at).toLocaleString()}
+                </p>
+                <p className="text-xs text-green-600 mt-1">
+                  {t('ይህ ሪፖርት ቀደም ብሎ ገብቷል። ዳሽቦርድ ላይ ተመለስ።', 'This report has already been submitted. Please return to dashboard.')}
                 </p>
               </div>
             )}
 
             <div className="flex space-x-4">
-              <button
-                type="submit"
-                disabled={submitting}
-                className="flex-1 flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50"
-              >
-                <Save size={20} />
-                <span>{submitting ? t('በማስገባት ላይ...', 'Submitting...') : t('ሪፖርት አስገባ', 'Submit Report')}</span>
-              </button>
-              
-              <button
-                type="button"
-                onClick={() => navigate('/')}
-                className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-              >
-                {t('ሰርዝ', 'Cancel')}
-              </button>
+              {report.submitted_at ? (
+                <button
+                  type="button"
+                  onClick={() => navigate('/')}
+                  className="flex-1 flex items-center justify-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 rounded-lg transition"
+                >
+                  <ArrowLeft size={20} />
+                  <span>{t('ወደ ዳሽቦርድ ተመለስ', 'Return to Dashboard')}</span>
+                </button>
+              ) : (
+                <>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex-1 flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50"
+                  >
+                    <Save size={20} />
+                    <span>{submitting ? t('በማስገባት ላይ...', 'Submitting...') : t('ሪፖርት አስገባ', 'Submit Report')}</span>
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => navigate('/')}
+                    className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                  >
+                    {t('ሰርዝ', 'Cancel')}
+                  </button>
+                </>
+              )}
             </div>
           </form>
         </div>

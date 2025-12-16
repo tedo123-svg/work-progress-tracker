@@ -24,6 +24,16 @@ export const submitMonthlyReport = async (req, res) => {
     
     const report = reportResult.rows[0];
     
+    // Check if report has already been submitted
+    if (report.submitted_at) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ 
+        error: 'Report has already been submitted',
+        message: 'You have already submitted this report. Duplicate submissions are not allowed.',
+        submitted_at: report.submitted_at
+      });
+    }
+    
     // Calculate progress percentage
     const progressPercentage = report.target_amount > 0 
       ? (achievedAmount / report.target_amount) * 100 

@@ -13,6 +13,8 @@ function SubmitAmharicReport({ user, onLogout }) {
   const [plan, setPlan] = useState(null);
   const [activities, setActivities] = useState([]);
   const [reports, setReports] = useState({});
+  const [existingReports, setExistingReports] = useState([]);
+  const [hasSubmittedReports, setHasSubmittedReports] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -32,12 +34,29 @@ function SubmitAmharicReport({ user, onLogout }) {
       const activitiesData = activitiesResponse.data || [];
       setActivities(activitiesData);
 
+      // Check for existing reports
+      try {
+        const existingReportsResponse = await annualPlanAPI.getAmharicActivityReports(planId);
+        const existingData = existingReportsResponse.data || [];
+        setExistingReports(existingData);
+        
+        // Check if any reports have been submitted
+        const hasSubmitted = existingData.some(report => report.status === 'submitted');
+        setHasSubmittedReports(hasSubmitted);
+      } catch (reportErr) {
+        console.log('No existing reports found or error fetching reports:', reportErr);
+        setExistingReports([]);
+        setHasSubmittedReports(false);
+      }
+
       // Initialize reports state
       const initialReports = {};
       activitiesData.forEach(activity => {
+        // Check if there's an existing report for this activity
+        const existingReport = existingReports.find(r => r.plan_activity_id === activity.id);
         initialReports[activity.id] = {
-          achieved_number: 0,
-          notes_amharic: ''
+          achieved_number: existingReport?.achieved_number || 0,
+          notes_amharic: existingReport?.notes_amharic || ''
         };
       });
       setReports(initialReports);
@@ -171,6 +190,13 @@ function SubmitAmharicReport({ user, onLogout }) {
             </div>
           )}
 
+          {hasSubmittedReports && (
+            <div className="bg-green-500/20 border border-green-400/50 text-green-200 px-6 py-4 rounded-xl mb-6 backdrop-blur-sm">
+              <p className="font-semibold">✅ የእንቅስቃሴ ሪፖርቶች ቀደም ብሎ ገብተዋል</p>
+              <p className="text-sm mt-1">ይህ እቅድ ለዚህ ወር ቀደም ብሎ ሪፖርት ተላክቷል። ዳሽቦርድ ላይ ተመለስ።</p>
+            </div>
+          )}
+
           {/* Activity Reports Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="glass rounded-3xl shadow-2xl p-8 backdrop-blur-xl border border-white/20">
@@ -218,10 +244,12 @@ function SubmitAmharicReport({ user, onLogout }) {
                             type="number"
                             value={report.achieved_number}
                             onChange={(e) => updateReport(activity.id, 'achieved_number', parseInt(e.target.value) || 0)}
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white text-center text-lg font-semibold focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                            className={`w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white text-center text-lg font-semibold focus:ring-2 focus:ring-green-500 focus:border-transparent transition ${hasSubmittedReports ? 'opacity-50 cursor-not-allowed' : ''}`}
                             min="0"
                             max={activity.target_number * 2} // Allow up to 200% of target
                             required
+                            disabled={hasSubmittedReports}
+                            readOnly={hasSubmittedReports}
                           />
                           <div className="mt-2 text-center">
                             <span className={`text-sm font-semibold ${
@@ -240,10 +268,12 @@ function SubmitAmharicReport({ user, onLogout }) {
                           <textarea
                             value={report.notes_amharic}
                             onChange={(e) => updateReport(activity.id, 'notes_amharic', e.target.value)}
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition resize-none"
+                            className={`w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition resize-none ${hasSubmittedReports ? 'opacity-50 cursor-not-allowed' : ''}`}
                             rows="4"
                             placeholder="የእንቅስቃሴው ትግበራ ዝርዝር፣ ተግዳሮቶች እና ስኬቶች ያስገቡ..."
                             style={{ fontFamily: "'Noto Sans Ethiopic', sans-serif" }}
+                            disabled={hasSubmittedReports}
+                            readOnly={hasSubmittedReports}
                           />
                         </div>
                       </div>
@@ -273,31 +303,44 @@ function SubmitAmharicReport({ user, onLogout }) {
 
             {/* Submit Button */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <button
-                type="submit"
-                disabled={submitting}
-                className="flex-1 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold py-4 rounded-xl transition transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 shadow-lg flex items-center justify-center gap-3"
-              >
-                {submitting ? (
-                  <>
-                    <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    ሪፖርት በመላክ ላይ...
-                  </>
-                ) : (
-                  <>
-                    <Save size={24} />
-                    የእንቅስቃሴ ሪፖርት አስገባ
-                  </>
-                )}
-              </button>
-              
-              <button
-                type="button"
-                onClick={() => navigate('/amharic-plan-reports')}
-                className="px-8 py-4 bg-white/10 border border-white/20 rounded-xl hover:bg-white/20 transition text-white font-semibold"
-              >
-                ሰርዝ
-              </button>
+              {hasSubmittedReports ? (
+                <button
+                  type="button"
+                  onClick={() => navigate('/amharic-plan-reports')}
+                  className="flex-1 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-semibold py-4 rounded-xl transition transform hover:scale-105 shadow-lg flex items-center justify-center gap-3"
+                >
+                  <ArrowLeft size={24} />
+                  ወደ እቅድ ሪፖርቶች ተመለስ
+                </button>
+              ) : (
+                <>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex-1 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold py-4 rounded-xl transition transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 shadow-lg flex items-center justify-center gap-3"
+                  >
+                    {submitting ? (
+                      <>
+                        <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        ሪፖርት በመላክ ላይ...
+                      </>
+                    ) : (
+                      <>
+                        <Save size={24} />
+                        የእንቅስቃሴ ሪፖርት አስገባ
+                      </>
+                    )}
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => navigate('/amharic-plan-reports')}
+                    className="px-8 py-4 bg-white/10 border border-white/20 rounded-xl hover:bg-white/20 transition text-white font-semibold"
+                  >
+                    ሰርዝ
+                  </button>
+                </>
+              )}
             </div>
           </form>
         </div>

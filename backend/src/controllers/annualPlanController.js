@@ -314,6 +314,23 @@ export const submitAmharicActivityReports = async (req, res) => {
     
     const monthlyPeriodId = periodResult.rows[0].id;
     
+    // Check if any reports have already been submitted for this plan and period
+    const submittedReportsCheck = await client.query(
+      `SELECT ar.id FROM activity_reports ar
+       JOIN plan_activities pa ON ar.plan_activity_id = pa.id
+       WHERE pa.annual_plan_id = $1 AND ar.monthly_period_id = $2 AND ar.branch_user_id = $3 
+       AND ar.status = 'submitted'`,
+      [planId, monthlyPeriodId, userId]
+    );
+    
+    if (submittedReportsCheck.rows.length > 0) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ 
+        error: 'Reports have already been submitted for this plan',
+        message: 'You have already submitted activity reports for this plan this month. Duplicate submissions are not allowed.'
+      });
+    }
+
     // Submit reports for each activity
     for (const report of reports) {
       // Validate each report object
