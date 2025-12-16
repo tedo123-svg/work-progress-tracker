@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { LogOut, BarChart3, User, Sparkles, Languages } from 'lucide-react';
+import { LogOut, BarChart3, User, Sparkles, Languages, FileText } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { transformBranchName } from '../utils/branchNameTransform';
 import NavbarCountdown from './NavbarCountdown';
@@ -12,12 +12,12 @@ function Navbar({ user, onLogout }) {
       <div className="container mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-              <BarChart3 size={24} className="text-white" />
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform border-2 border-white/20">
+              <FileText size={24} className="text-white" />
             </div>
             <div>
-              <span className="text-xl font-bold text-white block">{t('የስራ እድገት', 'Work Progress')}</span>
-              <span className="text-xs text-purple-300">{t('መከታተያ ስርዓት', 'Tracker System')}</span>
+              <span className="text-xl font-bold text-white block">{t('ዘመናዊ እቅድ እና ሪፖርት', 'Modern Plan and Report')}</span>
+              <span className="text-xs text-purple-300">{t('መላኪያ ስርዓት', 'Sender System')}</span>
             </div>
           </Link>
           
