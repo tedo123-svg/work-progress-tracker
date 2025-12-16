@@ -64,11 +64,15 @@ export const authorizeSectorAdmin = (req, res, next) => {
   next();
 };
 
-// Allow main branch or sector admins
+// Allow main branch, sector admins, and woreda sector users
 export const authorizeMainBranchOrSector = (req, res, next) => {
-  const allowedRoles = ['main_branch', 'organization_sector', 'information_sector', 'operation_sector', 'peace_value_sector'];
+  const allowedRoles = [
+    'main_branch', 
+    'organization_sector', 'information_sector', 'operation_sector', 'peace_value_sector',
+    'woreda_organization', 'woreda_information', 'woreda_operation', 'woreda_peace_value'
+  ];
   if (!allowedRoles.includes(req.user.role)) {
-    return res.status(403).json({ error: 'Access denied. Main branch or sector admin role required.' });
+    return res.status(403).json({ error: 'Access denied. Main branch, sector admin, or woreda sector user role required.' });
   }
   next();
 };
