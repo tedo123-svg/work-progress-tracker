@@ -88,13 +88,17 @@ export const getAnnualPlans = async (req, res) => {
                  LEFT JOIN users u ON ap.created_by = u.id`;
     let params = [];
     
-    // Filter by sector for sector admins
+    // Filter by sector for sector admins and woreda sector users
     if (req.user.role !== 'main_branch') {
       const sectorMap = {
         'organization_sector': 'organization',
         'information_sector': 'information',
         'operation_sector': 'operation',
-        'peace_value_sector': 'peace_value'
+        'peace_value_sector': 'peace_value',
+        'woreda_organization': 'organization',
+        'woreda_information': 'information',
+        'woreda_operation': 'operation',
+        'woreda_peace_value': 'peace_value'
       };
       
       const userSector = sectorMap[req.user.role];
