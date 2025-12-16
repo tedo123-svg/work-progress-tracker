@@ -623,9 +623,11 @@ export const createAmharicPlan = async (req, res) => {
       );
     }
 
-    // Create activity reports for all branch users for each activity and period
+    // Create activity reports for all branch users and matching woreda sector users
     const branchUsers = await client.query(
-      "SELECT id FROM users WHERE role = 'branch_user'"
+      `SELECT id FROM users WHERE role = 'branch_user' 
+       OR (role LIKE 'woreda_%' AND sector = $1)`,
+      [sector]
     );
 
     const monthlyPeriods = await client.query(
