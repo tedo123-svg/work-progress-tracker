@@ -55,7 +55,7 @@ export const exportToPDF = (reports, month, year, language = 'en') => {
     startY: 45,
     head: [[
       getDisplayText('ቅርንጫፍ', 'Branch', !useAmharic),
-      getDisplayText('ዒላማ', 'Target', !useAmharic),
+      getDisplayText('እቅድ', 'Target', !useAmharic),
       getDisplayText('የተሳካ', 'Achieved', !useAmharic),
       getDisplayText('እድገት', 'Progress', !useAmharic),
       getDisplayText('ደረጃ', 'Grade', !useAmharic),
@@ -256,7 +256,7 @@ export const exportToPDF = (reports, month, year, language = 'en') => {
   doc.text(summaryTitle, 14, summaryY);
   doc.setFontSize(10);
   
-  const totalTargetLabel = getDisplayText('ጠቅላላ ዒላማ', 'Total Target', !useAmharic);
+  const totalTargetLabel = getDisplayText('ጠቅላላ እቅድ', 'Total Target', !useAmharic);
   const totalAchievedLabel = getDisplayText('ጠቅላላ የተሳካ', 'Total Achieved', !useAmharic);
   const avgProgressLabel = getDisplayText('አማካይ እድገት', 'Average Progress', !useAmharic);
   const totalReportsLabel = getDisplayText('ጠቅላላ ሪፖርቶች', 'Total Reports', !useAmharic);
@@ -292,7 +292,7 @@ export const exportToExcel = (reports, month, year, language = 'en') => {
     const gradeInfo = calculateGrade(Number(report.progress_percentage) || 0);
     return {
       [language === 'am' ? 'ቅርንጫፍ' : 'Branch']: report.branch_name || '',
-      [language === 'am' ? 'ዒላማ' : 'Target']: Number(report.target_amount) || 0,
+      [language === 'am' ? 'እቅድ' : 'Target']: Number(report.target_amount) || 0,
       [language === 'am' ? 'የተሳካ' : 'Achieved']: Number(report.achieved_amount) || 0,
       [language === 'am' ? 'እድገት %' : 'Progress %']: (Number(report.progress_percentage) || 0).toFixed(1),
       [language === 'am' ? 'ደረጃ' : 'Grade']: gradeInfo.grade,
@@ -330,7 +330,7 @@ export const exportToExcel = (reports, month, year, language = 'en') => {
       : 0;
     
     const summaryData = [
-      { [language === 'am' ? 'መለኪያ' : 'Metric']: language === 'am' ? 'ጠቅላላ ዒላማ' : 'Total Target', [language === 'am' ? 'ዋጋ' : 'Value']: totalTarget },
+      { [language === 'am' ? 'መለኪያ' : 'Metric']: language === 'am' ? 'ጠቅላላ እቅድ' : 'Total Target', [language === 'am' ? 'ዋጋ' : 'Value']: totalTarget },
       { [language === 'am' ? 'መለኪያ' : 'Metric']: language === 'am' ? 'ጠቅላላ የተሳካ' : 'Total Achieved', [language === 'am' ? 'ዋጋ' : 'Value']: totalAchieved },
       { [language === 'am' ? 'መለኪያ' : 'Metric']: language === 'am' ? 'አማካይ እድገት %' : 'Average Progress %', [language === 'am' ? 'ዋጋ' : 'Value']: Number(avgProgress).toFixed(1) },
       { [language === 'am' ? 'መለኪያ' : 'Metric']: language === 'am' ? 'ጠቅላላ ሪፖርቶች' : 'Total Reports', [language === 'am' ? 'ዋጋ' : 'Value']: reports.length }
@@ -358,7 +358,7 @@ export const exportToWord = async (reports, month, year, language = 'en') => {
     new TableRow({
       children: [
         new TableCell({ children: [new Paragraph({ text: language === 'am' ? 'ቅርንጫፍ' : 'Branch', bold: true })] }),
-        new TableCell({ children: [new Paragraph({ text: language === 'am' ? 'ዒላማ' : 'Target', bold: true })] }),
+        new TableCell({ children: [new Paragraph({ text: language === 'am' ? 'እቅድ' : 'Target', bold: true })] }),
         new TableCell({ children: [new Paragraph({ text: language === 'am' ? 'የተሳካ' : 'Achieved', bold: true })] }),
         new TableCell({ children: [new Paragraph({ text: language === 'am' ? 'እድገት' : 'Progress', bold: true })] }),
         new TableCell({ children: [new Paragraph({ text: language === 'am' ? 'ደረጃ' : 'Grade', bold: true })] }),
@@ -411,7 +411,7 @@ export const exportToWord = async (reports, month, year, language = 'en') => {
           spacing: { before: 400, after: 200 }
         }),
         new Paragraph({
-          text: `${language === 'am' ? 'ጠቅላላ ዒላማ' : 'Total Target'}: ${reports.reduce((sum, r) => sum + (Number(r.target_amount) || 0), 0).toLocaleString()}`
+          text: `${language === 'am' ? 'ጠቅላላ እቅድ' : 'Total Target'}: ${reports.reduce((sum, r) => sum + (Number(r.target_amount) || 0), 0).toLocaleString()}`
         }),
         new Paragraph({
           text: `${language === 'am' ? 'ጠቅላላ የተሳካ' : 'Total Achieved'}: ${reports.reduce((sum, r) => sum + (Number(r.achieved_amount) || 0), 0).toLocaleString()}`
@@ -485,7 +485,7 @@ export const exportAmharicPlanToPDF = (plan, activities, language = 'am') => {
       
       // Create narrative format for target information
       doc.setFontSize(10);
-      const targetNarrative = `ዒላማ ${activity.target_number} ከዒላማ ${activity.target_number} 100%`;
+      const targetNarrative = `እቅድ ${activity.target_number} ከእቅድ ${activity.target_number} 100%`;
       
       // Add indentation for the target narrative
       doc.text(targetNarrative, 20, currentY);
@@ -556,7 +556,7 @@ export const exportAmharicReportsToPDF = (reports, plan, month, year, language =
       if (!activityGroups[activityKey]) {
         activityGroups[activityKey] = {
           activity_number: activityKey,
-          activity_title_amharic: report.activity_title_amharic || 'የወርሃዊ ዒላማ ተግባር',
+          activity_title_amharic: report.activity_title_amharic || 'የወርሃዊ እቅድ ተግባር',
           target_number: report.target_number || 0,
           target_unit_amharic: report.target_unit_amharic || 'ብር',
           reports: []
@@ -599,8 +599,8 @@ export const exportAmharicReportsToPDF = (reports, plan, month, year, language =
         const achieved = (Number(report.actual_achievement) || 0).toLocaleString();
         const percentage = (Number(report.achievement_percentage) || 0).toFixed(1);
         
-        // Create narrative text like: "ዒላማ 1 ከዒላማ 1 100%"
-        const narrativeText = `ዒላማ ${target} ከዒላማ ${achieved} ${percentage}%`;
+        // Create narrative text like: "እቅድ 1 ከእቅድ 1 100%"
+        const narrativeText = `እቅድ ${target} ከእቅድ ${achieved} ${percentage}%`;
         
         // Add indentation for sub-items
         doc.text(narrativeText, 20, currentY);
@@ -620,7 +620,7 @@ export const exportAmharicReportsToPDF = (reports, plan, month, year, language =
       doc.setFont(useAmharic ? 'GeezDigital_V1' : 'helvetica', 'normal');
       
       // Create summary narrative like the image format
-      const summaryNarrative = `ዒላማ ${activityTarget.toLocaleString()} ከዒላማ ${activityTotal.toLocaleString()} ${activityPercentage}%በላይ`;
+      const summaryNarrative = `እቅድ ${activityTarget.toLocaleString()} ከእቅድ ${activityTotal.toLocaleString()} ${activityPercentage}%በላይ`;
       const wrappedSummary = doc.splitTextToSize(summaryNarrative, 170);
       doc.text(wrappedSummary, 20, currentY);
       currentY += (wrappedSummary.length * 6) + 10;
@@ -709,7 +709,7 @@ export const exportActionReportsToPDF = (actionReports, month, year, language = 
       // Action Details
       doc.setFontSize(10);
       doc.setTextColor(100, 100, 100);
-      const targetLabel = getDisplayText('ዒላማ', 'Target', !useAmharic);
+      const targetLabel = getDisplayText('እቅድ', 'Target', !useAmharic);
       doc.text(`${targetLabel}: ${(actionGroup.plan_activity || 0).toLocaleString()}`, 14, currentY);
       currentY += 10;
       
@@ -799,7 +799,7 @@ export const exportAmharicPlanToExcel = (plan, activities, language = 'am') => {
     const activitiesData = activities.map(activity => ({
       'ቁጥር': activity.activity_number,
       'የእንቅስቃሴ ርዕስ': activity.activity_title_amharic,
-      'ዒላማ ቁጥር': activity.target_number,
+      'እቅድ ቁጥር': activity.target_number,
       'መለኪያ': activity.target_unit_amharic
     }));
     
@@ -827,7 +827,7 @@ export const exportAmharicReportsToExcel = (reports, plan, month, year, language
       if (!activityGroups[activityKey]) {
         activityGroups[activityKey] = {
           activity_number: activityKey,
-          activity_title_amharic: report.activity_title_amharic || 'የወርሃዊ ዒላማ ተግባር',
+          activity_title_amharic: report.activity_title_amharic || 'የወርሃዊ እቅድ ተግባር',
           target_number: report.target_number || 0,
           target_unit_amharic: report.target_unit_amharic || 'ብር',
           reports: []
@@ -878,8 +878,8 @@ export const exportAmharicReportsToExcel = (reports, plan, month, year, language
         const achieved = (Number(report.actual_achievement) || 0).toLocaleString();
         const percentage = (Number(report.achievement_percentage) || 0).toFixed(1);
         
-        // Create narrative format: "ዒላማ 1 ከዒላማ 1 100%"
-        const narrativeText = `ዒላማ ${target} ከዒላማ ${achieved} ${percentage}%`;
+        // Create narrative format: "እቅድ 1 ከእቅድ 1 100%"
+        const narrativeText = `እቅድ ${target} ከእቅድ ${achieved} ${percentage}%`;
         
         structuredData.push({
           'A': narrativeText,
@@ -895,7 +895,7 @@ export const exportAmharicReportsToExcel = (reports, plan, month, year, language
       const activityPercentage = activityTarget > 0 ? ((activityTotal / activityTarget) * 100).toFixed(1) : '0.0';
       
       // Summary narrative
-      const summaryNarrative = `ዒላማ ${activityTarget.toLocaleString()} ከዒላማ ${activityTotal.toLocaleString()} ${activityPercentage}%በላይ`;
+      const summaryNarrative = `እቅድ ${activityTarget.toLocaleString()} ከእቅድ ${activityTotal.toLocaleString()} ${activityPercentage}%በላይ`;
       
       structuredData.push({
         'A': summaryNarrative,
@@ -929,7 +929,7 @@ export const exportAmharicReportsToExcel = (reports, plan, month, year, language
       return {
         'ቁጥር': activityGroup.activity_number,
         'እንቅስቃሴ': activityGroup.activity_title_amharic,
-        'ዒላማ': activityGroup.target_number,
+        'እቅድ': activityGroup.target_number,
         'መለኪያ': activityGroup.target_unit_amharic,
         'ጠቅላላ ተሳካ': totalAchieved,
         'አማካይ መቶኛ': `${avgPercentage.toFixed(1)}%`,
@@ -978,7 +978,7 @@ export const exportActionReportsToExcel = (actionReports, month, year, language 
       detailedData.push({
         [language === 'am' ? 'ተግባር ቁጥር' : 'Action Number']: actionGroup.action_number,
         [language === 'am' ? 'ተግባር ርዕስ' : 'Action Title']: actionGroup.action_title,
-        [language === 'am' ? 'ዒላማ' : 'Target']: actionGroup.plan_activity,
+        [language === 'am' ? 'እቅድ' : 'Target']: actionGroup.plan_activity,
         [language === 'am' ? 'ቅርንጫፍ' : 'Branch']: '',
         [language === 'am' ? 'ተግባር' : 'Achievement']: '',
         [language === 'am' ? 'ትግበራ %' : 'Implementation %']: '',
@@ -990,7 +990,7 @@ export const exportActionReportsToExcel = (actionReports, month, year, language 
         detailedData.push({
           [language === 'am' ? 'ተግባር ቁጥር' : 'Action Number']: '',
           [language === 'am' ? 'ተግባር ርዕስ' : 'Action Title']: '',
-          [language === 'am' ? 'ዒላማ' : 'Target']: '',
+          [language === 'am' ? 'እቅድ' : 'Target']: '',
           [language === 'am' ? 'ቅርንጫፍ' : 'Branch']: report.branch_name || '',
           [language === 'am' ? 'ተግባር' : 'Achievement']: Number(report.actual_activity) || 0,
           [language === 'am' ? 'ትግበራ %' : 'Implementation %']: (Number(report.implementation_percentage) || 0).toFixed(1),
@@ -1072,7 +1072,7 @@ export const exportAmharicPlanToWord = async (plan, activities, language = 'am')
     }
     
     children.push(new Paragraph({
-      text: 'ዒላማ እንቅስቃሴዎች:',
+      text: 'ተግባራት:',
       heading: 'Heading2',
       spacing: { before: 400, after: 200 }
     }));
@@ -1084,7 +1084,7 @@ export const exportAmharicPlanToWord = async (plan, activities, language = 'am')
         spacing: { before: 200, after: 100 }
       }));
       children.push(new Paragraph({
-        text: `ዒላማ: ${activity.target_number} ${activity.target_unit_amharic}`,
+        text: `እቅድ: ${activity.target_number} ${activity.target_unit_amharic}`,
         spacing: { before: 100, after: 200 }
       }));
     });
@@ -1157,7 +1157,7 @@ export const exportAmharicReportsToWord = async (reports, plan, month, year, lan
       
       // Target information
       children.push(new Paragraph({
-        text: `ዒላማ: ${activityGroup.target_number} ${activityGroup.target_unit_amharic}`,
+        text: `እቅድ: ${activityGroup.target_number} ${activityGroup.target_unit_amharic}`,
         spacing: { after: 200 }
       }));
       
@@ -1168,7 +1168,7 @@ export const exportAmharicReportsToWord = async (reports, plan, month, year, lan
         const percentage = (Number(report.achievement_percentage) || 0).toFixed(1);
         
         // Create narrative text
-        const narrativeText = `ዒላማ ${target} ከዒላማ ${achieved} ${percentage}%`;
+        const narrativeText = `እቅድ ${target} ከእቅድ ${achieved} ${percentage}%`;
         
         children.push(new Paragraph({
           text: narrativeText,
@@ -1251,7 +1251,7 @@ export const exportActionReportsToWord = async (actionReports, month, year, lang
       
       // Action details
       children.push(new Paragraph({
-        text: `${language === 'am' ? 'ዒላማ' : 'Target'}: ${(actionGroup.plan_activity || 0).toLocaleString()}`,
+        text: `${language === 'am' ? 'እቅድ' : 'Target'}: ${(actionGroup.plan_activity || 0).toLocaleString()}`,
         spacing: { after: 200 }
       }));
       

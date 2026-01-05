@@ -74,7 +74,7 @@ function CreateAnnualPlan({ user, onLogout }) {
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm"
-                placeholder={t('ለምሳሌ፣ 2025 የሽያጭ ዒላማ', 'e.g., 2025 Sales Target')}
+                placeholder={t('ለምሳሌ፣ 2025 የሽያጭ እቅድ', 'e.g., 2025 Sales Target')}
                 required
               />
             </div>
@@ -108,7 +108,7 @@ function CreateAnnualPlan({ user, onLogout }) {
 
             <div>
               <label className="block text-sm font-medium text-purple-200 mb-2">
-                {t('ዒላማ ቁጥር', 'Target Number')} *
+                {t('እቅድ', 'Target Number')} *
               </label>
               <input
                 type="number"
@@ -119,7 +119,7 @@ function CreateAnnualPlan({ user, onLogout }) {
                 step="0.01"
                 required
               />
-              <p className="text-sm text-purple-300 mt-2">{t('ለመከታተል የዒላማ ቁጥር ያስገቡ', 'Enter the target number to track')}</p>
+              <p className="text-sm text-purple-300 mt-2">{t('ለመከታተል የእቅድ ቁጥር ያስገቡ', 'Enter the target number to track')}</p>
             </div>
 
             <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-400/30 rounded-xl p-5 backdrop-blur-sm">
@@ -136,7 +136,7 @@ function CreateAnnualPlan({ user, onLogout }) {
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
-                  {t('ወርሃዊ ዒላማዎች በእኩል ይከፋፈላሉ', 'Monthly targets will be evenly distributed')}
+                  {t('ወርሃዊ እቅዶች በእኩል ይከፋፈላሉ', 'Monthly targets will be evenly distributed')}
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 bg-pink-400 rounded-full"></div>

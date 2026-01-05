@@ -227,7 +227,7 @@ function SubmitAmharicReport({ user, onLogout }) {
                             <div className="flex items-center gap-4 text-sm text-purple-200">
                               <span className="flex items-center gap-1">
                                 <Target size={14} />
-                                ዒላማ ቁጥር: {activity.target_number.toLocaleString()} {activity.target_unit_amharic}
+                                እቅድ: {activity.target_number.toLocaleString()} {activity.target_unit_amharic}
                               </span>
                             </div>
                           </div>

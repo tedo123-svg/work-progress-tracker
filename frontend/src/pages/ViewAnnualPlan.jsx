@@ -209,7 +209,7 @@ function ViewAnnualPlan({ user, onLogout }) {
             </div>
             
             <div className="bg-green-50 rounded-lg p-4">
-              <div className="text-sm text-gray-600 mb-1">{t('ዒላማ ቁጥር', 'Target Number')}</div>
+              <div className="text-sm text-gray-600 mb-1">{t('እቅድ', 'Target Number')}</div>
               <div className="text-2xl font-bold text-green-600">
                 {plan.target_amount?.toLocaleString()}
               </div>
@@ -263,7 +263,7 @@ function ViewAnnualPlan({ user, onLogout }) {
           <>
             <div className="grid grid-cols-2 gap-6 mb-6">
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">{t('ወርሃዊ ዒላማዎች', 'Monthly Targets')}</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">{t('ወርሃዊ እቅዶች', 'Monthly Targets')}</h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={monthlyChartData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -300,7 +300,7 @@ function ViewAnnualPlan({ user, onLogout }) {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('ወር', 'Month')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('ዒላማ ቁጥር', 'Target Number')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('እቅድ', 'Target Number')}</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('የመጨረሻ ቀን', 'Deadline')}</th>
                 </tr>
               </thead>
@@ -471,7 +471,7 @@ function ViewAnnualPlan({ user, onLogout }) {
                             {t('ተግባር', 'Action')} {actionGroup.action_number}: {actionGroup.action_title}
                           </h3>
                           <div className="flex flex-wrap gap-4 text-sm text-purple-200">
-                            <span>{t('ዒላማ', 'Target')}: {(actionGroup.plan_activity || 0).toLocaleString()}</span>
+                            <span>{t('እቅድ', 'Target')}: {(actionGroup.plan_activity || 0).toLocaleString()}</span>
                           </div>
                         </div>
                         <div className="text-right">

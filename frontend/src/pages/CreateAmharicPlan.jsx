@@ -108,7 +108,7 @@ function CreateAmharicPlan({ user, onLogout }) {
               የአማርኛ መዋቅራዊ እቅድ ፍጠር
             </h1>
             <p className="text-purple-200">
-              ተዋቅሮ የተዘጋጀ የአማርኛ እቅድ ከንዑስ እንቅስቃሴዎች እና ዒላማዎች ጋር ይፍጠሩ
+              ተዋቅሮ የተዘጋጀ የአማርኛ እቅድ ከንዑስ እንቅስቃሴዎች እና እቅዶች ጋር ይፍጠሩ
             </p>
           </div>
 
@@ -333,7 +333,7 @@ function CreateAmharicPlan({ user, onLogout }) {
                     <span className="font-bold text-blue-300 min-w-[60px]">{activity.activity_number}</span>
                     <span className="flex-1">{activity.activity_title_amharic || '...'}</span>
                     <span className="text-green-300 min-w-[80px] text-right">
-                      ዒላማ: {activity.target_number} {activity.target_unit_amharic}
+                      እቅድ: {activity.target_number} {activity.target_unit_amharic}
                     </span>
                   </div>
                 ))}

@@ -104,7 +104,7 @@ function CreateActions({ user, onLogout }) {
               {t('ተግባራት ፍጠር', 'Create Actions')}
             </h1>
             <p className="text-purple-200">
-              {t('ተግባራትን እና ዒላማ እንቅስቃሴዎች ይግለጹ። ቅርንጫፎች የተጠናቀቁ ትክክለኛ እንቅስቃሴዎችን ሪፖርት ያደርጋሉ።', 'Define actions and target activities. Branches will report actual activities completed.')}
+              {t('ተግባራትን እና ተግባራት ይግለጹ። ቅርንጫፎች የተጠናቀቁ ትክክለኛ እንቅስቃሴዎችን ሪፖርት ያደርጋሉ።', 'Define actions and target activities. Branches will report actual activities completed.')}
             </p>
           </div>
 
@@ -190,7 +190,7 @@ function CreateActions({ user, onLogout }) {
 
                 <div>
                   <label className="block text-sm font-medium text-purple-200 mb-2">
-                    {t('የእቅድ እንቅስቃሴ (ዒላማ) *', 'Plan Activity (Target) *')}
+                    {t('የእቅድ እንቅስቃሴ (እቅድ) *', 'Plan Activity (Target) *')}
                   </label>
                   <input
                     type="number"
