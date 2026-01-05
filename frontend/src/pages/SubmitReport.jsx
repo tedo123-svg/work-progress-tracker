@@ -109,14 +109,14 @@ function SubmitReport({ user, onLogout }) {
 
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-blue-50 rounded-lg p-4">
-              <div className="text-sm text-gray-600">{t('ዒላማ መጠን', 'Target Amount')}</div>
+              <div className="text-sm text-gray-600">{t('እቅድ መጠን', 'Target Amount')}</div>
               <div className="text-2xl font-bold text-blue-600">
                 {report.target_amount?.toLocaleString()}
               </div>
             </div>
             
             <div className="bg-purple-50 rounded-lg p-4">
-              <div className="text-sm text-gray-600">{t('ዒላማ ክፍሎች', 'Target Units')}</div>
+              <div className="text-sm text-gray-600">{t('እቅድ ክፍሎች', 'Target Units')}</div>
               <div className="text-2xl font-bold text-purple-600">
                 {report.target_units?.toLocaleString()}
               </div>

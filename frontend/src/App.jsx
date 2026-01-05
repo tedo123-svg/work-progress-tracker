@@ -114,12 +114,12 @@ function App() {
         
         <Route 
           path="/amharic-plan-reports" 
-          element={user?.role === 'branch_user' ? <AmharicPlanReports user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
+          element={user?.role === 'branch_user' || isWoredaSectorUser(user) ? <AmharicPlanReports user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
         />
         
         <Route 
           path="/submit-amharic-report/:planId" 
-          element={user?.role === 'branch_user' ? <SubmitAmharicReport user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
+          element={user?.role === 'branch_user' || isWoredaSectorUser(user) ? <SubmitAmharicReport user={user} onLogout={handleLogout} /> : <Navigate to="/" />} 
         />
         
         <Route 

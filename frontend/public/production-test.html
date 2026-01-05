@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Test - Woreda Report Access Fix</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .test-section h2 {
+            color: #ffd700;
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+        .url-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+        .test-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+            display: inline-block;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        .checklist input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-success { background: #4CAF50; }
+        .status-warning { background: #ff9800; }
+        .status-error { background: #f44336; }
+        .credentials-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .role-badge {
+            display: inline-block;
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            margin: 2px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Production Test - Woreda Report Access Fix</h1>
+        
+        <div class="test-section">
+            <h2>📍 Production Environment</h2>
+            <p><strong>Deployment URL:</strong></p>
+            <div class="url-box">
+                https://work-progress-tracker-qsa5avp76-tewodros-projects-054cf56b.vercel.app/
+            </div>
+            <a href="https://work-progress-tracker-qsa5avp76-tewodros-projects-054cf56b.vercel.app/" 
+               class="test-button" target="_blank">🚀 Open Production App</a>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 Debug Tools</h2>
+            <p>Use these tools to test the Woreda report access fix in production:</p>
+            
+            <div style="margin: 15px 0;">
+                <strong>Interactive Debug Interface:</strong>
+                <div class="url-box">
+                    https://work-progress-tracker-qsa5avp76-tewodros-projects-054cf56b.vercel.app/debug-woreda-fix.html
+                </div>
+                <a href="https://work-progress-tracker-qsa5avp76-tewodros-projects-054cf56b.vercel.app/debug-woreda-fix.html" 
+                   class="test-button" target="_blank">🔍 Open Debug Interface</a>
+            </div>
+
+            <div style="margin: 15px 0;">
+                <strong>Mobile Test Interface:</strong>
+                <div class="url-box">
+                    https://work-progress-tracker-qsa5avp76-tewodros-projects-054cf56b.vercel.app/mobile-test.html
+                </div>
+                <a href="https://work-progress-tracker-qsa5avp76-tewodros-projects-054cf56b.vercel.app/mobile-test.html" 
+                   class="test-button" target="_blank">📱 Test Mobile</a>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>👥 User Roles to Test</h2>
+            <p>Test the fix with these user roles:</p>
+            
+            <div style="margin: 20px 0;">
+                <h3>✅ Should Have Report Access:</h3>
+                <div>
+                    <span class="role-badge">branch_user</span>
+                    <span class="role-badge">woreda_organization</span>
+                    <span class="role-badge">woreda_information</span>
+                    <span class="role-badge">woreda_operation</span>
+                    <span class="role-badge">woreda_peace_value</span>
+                </div>
+            </div>
+
+            <div style="margin: 20px 0;">
+                <h3>❌ Should NOT Have Report Access:</h3>
+                <div>
+                    <span class="role-badge" style="background: rgba(244, 67, 54, 0.2); color: #f44336; border-color: rgba(244, 67, 54, 0.3);">main_branch</span>
+                    <span class="role-badge" style="background: rgba(244, 67, 54, 0.2); color: #f44336; border-color: rgba(244, 67, 54, 0.3);">organization_sector</span>
+                    <span class="role-badge" style="background: rgba(244, 67, 54, 0.2); color: #f44336; border-color: rgba(244, 67, 54, 0.3);">admin</span>
+                </div>
+            </div>
+
+            <div class="credentials-box">
+                <strong>⚠️ Note:</strong> Check your <code>COMPLETE-LOGIN-CREDENTIALS.md</code> file for actual test user credentials.
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 Production Testing Checklist</h2>
+            <p>Complete this checklist to verify the fix is working in production:</p>
+            
+            <ul class="checklist">
+                <li>
+                    <input type="checkbox" id="test1">
+                    <label for="test1">Woreda users can login successfully</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="test2">
+                    <label for="test2">Woreda users are redirected to BranchUserDashboard</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="test3">
+                    <label for="test3">"የአማርኛ እቅድ ሪፖርቶች" button is visible for Woreda users</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="test4">
+                    <label for="test4">Woreda users can access /amharic-plan-reports</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="test5">
+                    <label for="test5">"ሪፖርት አድርግ" buttons work for Woreda users</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="test6">
+                    <label for="test6">Woreda users can access /submit-amharic-report/:planId</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="test7">
+                    <label for="test7">Report submission form loads correctly</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="test8">
+                    <label for="test8">Woreda users cannot access /create-amharic-plan (redirected)</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="test9">
+                    <label for="test9">Main branch users cannot access report routes</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="test10">
+                    <label for="test10">Ethiopian calendar (2018 EC) is used in forms</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="test11">
+                    <label for="test11">Amharic text displays correctly (ተግባራት, እቅድ)</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="test12">
+                    <label for="test12">Peace and Security Administration Bureau logo is visible</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="test13">
+                    <label for="test13">Mobile responsiveness works correctly</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="test14">
+                    <label for="test14">Debug interface is accessible</label>
+                </li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Test Scenarios</h2>
+            <p>Follow these step-by-step scenarios:</p>
+            
+            <div style="margin: 20px 0;">
+                <h3>Scenario 1: Woreda User Login and Report Access</h3>
+                <ol style="line-height: 1.8;">
+                    <li>Open the production URL</li>
+                    <li>Login with a Woreda user (woreda_organization, etc.)</li>
+                    <li>Verify you're on BranchUserDashboard</li>
+                    <li>Look for "የአማርኛ እቅድ ሪፖርቶች" button</li>
+                    <li>Click the button to access reports</li>
+                    <li>Try to submit a report for any available plan</li>
+                    <li>Verify the form loads and works correctly</li>
+                </ol>
+            </div>
+
+            <div style="margin: 20px 0;">
+                <h3>Scenario 2: Main Branch User Restriction Test</h3>
+                <ol style="line-height: 1.8;">
+                    <li>Login with a Main Branch user</li>
+                    <li>Verify you're on MainBranchDashboard</li>
+                    <li>Try to manually navigate to /amharic-plan-reports</li>
+                    <li>Verify you're redirected back to dashboard</li>
+                    <li>Confirm you can access plan creation features instead</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Test Results</h2>
+            <div id="test-results">
+                <p>Complete the checklist above to see your test results here.</p>
+            </div>
+            <button class="test-button" onclick="calculateResults()">📈 Calculate Test Results</button>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 Expected Fix Behavior</h2>
+            <p>The Woreda report access fix should provide:</p>
+            <ul style="line-height: 1.8;">
+                <li><span class="status-indicator status-success"></span>All Woreda roles can access report submission</li>
+                <li><span class="status-indicator status-success"></span>Route protection works correctly</li>
+                <li><span class="status-indicator status-success"></span>Dashboard shows appropriate options for each role</li>
+                <li><span class="status-indicator status-success"></span>No unauthorized access is possible</li>
+                <li><span class="status-indicator status-success"></span>Ethiopian calendar and Amharic text work correctly</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function calculateResults() {
+            const checkboxes = document.querySelectorAll('.checklist input[type="checkbox"]');
+            const total = checkboxes.length;
+            const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const percentage = Math.round((checked / total) * 100);
+            
+            let status = '';
+            let statusClass = '';
+            
+            if (percentage >= 90) {
+                status = '🎉 Excellent! The fix is working perfectly in production.';
+                statusClass = 'status-success';
+            } else if (percentage >= 70) {
+                status = '⚠️ Good progress, but some issues need attention.';
+                statusClass = 'status-warning';
+            } else {
+                status = '❌ Several issues found. The fix may need additional work.';
+                statusClass = 'status-error';
+            }
+            
+            document.getElementById('test-results').innerHTML = `
+                <div style="padding: 20px; border-radius: 10px; background: rgba(255, 255, 255, 0.05);">
+                    <h3>Test Results Summary</h3>
+                    <p><strong>Completed:</strong> ${checked}/${total} tests (${percentage}%)</p>
+                    <div style="width: 100%; background: rgba(255, 255, 255, 0.1); border-radius: 10px; height: 20px; margin: 10px 0;">
+                        <div style="width: ${percentage}%; background: linear-gradient(45deg, #4CAF50, #45a049); height: 100%; border-radius: 10px; transition: width 0.5s ease;"></div>
+                    </div>
+                    <p class="${statusClass}"><strong>${status}</strong></p>
+                </div>
+            `;
+        }
+
+        // Auto-save checkbox states
+        document.addEventListener('change', function(e) {
+            if (e.target.type === 'checkbox') {
+                localStorage.setItem('woreda-test-' + e.target.id, e.target.checked);
+            }
+        });
+
+        // Load saved checkbox states
+        window.addEventListener('load', function() {
+            const checkboxes = document.querySelectorAll('.checklist input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                const saved = localStorage.getItem('woreda-test-' + cb.id);
+                if (saved === 'true') {
+                    cb.checked = true;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

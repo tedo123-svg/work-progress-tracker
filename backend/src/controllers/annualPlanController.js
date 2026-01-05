@@ -551,7 +551,7 @@ export const getAllAmharicActivityReports = async (req, res) => {
            json_agg(
              json_build_object(
                'activity_number', '1.0',
-               'activity_title_amharic', 'የወርሃዊ ዒላማ ተግባር',
+               'activity_title_amharic', 'የወርሃዊ እቅድ ተግባር',
                'target_number', mr.target_amount,
                'target_unit_amharic', 'ብር',
                'actual_achievement', mr.achieved_amount,

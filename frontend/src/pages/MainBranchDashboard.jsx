@@ -973,7 +973,7 @@ function MainBranchDashboard({ user, onLogout }) {
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 bg-pink-400 rounded-full"></div>
-                  {t('ዒላማ ቁጥሮች በራስ-ሰር ይገለበጣሉ', 'Target numbers automatically copied')}
+                  {t('እቅድ ቁጥሮች በራስ-ሰር ይገለበጣሉ', 'Target numbers automatically copied')}
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
