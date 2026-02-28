@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Production Login</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Production Login Tester</h1>
+        
+        <div class="test-section">
+            <h3>1. Test Backend Connection</h3>
+            <p>Check if the backend API is accessible</p>
+            <button onclick="testBackendConnection()">Test Backend</button>
+            <div id="backend-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Test Login with Credentials</h3>
+            <label>Username:</label>
+            <input type="text" id="username" value="woreda1_organization" placeholder="Enter username">
+            
+            <label>Password:</label>
+            <input type="password" id="password" value="woreda123" placeholder="Enter password">
+            
+            <button onclick="testLogin()">Test Login</button>
+            <div id="login-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Quick Test All Users</h3>
+            <p>Test login for all common users</p>
+            <button onclick="testAllUsers()">Test All Users</button>
+            <div id="all-users-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Check Environment</h3>
+            <button onclick="checkEnvironment()">Check Environment</button>
+            <div id="env-result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Get API URL from environment or use default
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        
+        async function testBackendConnection() {
+            const resultDiv = document.getElementById('backend-result');
+            resultDiv.innerHTML = '<div class="result info">Testing backend connection...</div>';
+            
+            try {
+                const response = await fetch(`${API_URL}/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `<div class="result success">✅ Backend is accessible!\n${JSON.stringify(data, null, 2)}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ Backend returned error: ${response.status} ${response.statusText}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">❌ Cannot connect to backend!\nError: ${error.message}\n\nAPI URL: ${API_URL}\n\nPossible issues:\n1. Backend is not running\n2. CORS is blocking the request\n3. Wrong API URL in environment variables</div>`;
+            }
+        }
+
+        async function testLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('login-result');
+            
+            resultDiv.innerHTML = '<div class="result info">Testing login...</div>';
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="result success">✅ Login successful!\n\nUser: ${data.user.username}\nRole: ${data.user.role}\nToken: ${data.token.substring(0, 50)}...</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ Login failed!\n\nStatus: ${response.status}\nError: ${data.error || 'Unknown error'}\n\nPossible issues:\n1. Wrong username or password\n2. User doesn't exist in database\n3. Password hash mismatch</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">❌ Login request failed!\nError: ${error.message}\n\nAPI URL: ${API_URL}/auth/login</div>`;
+            }
+        }
+
+        async function testAllUsers() {
+            const resultDiv = document.getElementById('all-users-result');
+            resultDiv.innerHTML = '<div class="result info">Testing all users...</div>';
+            
+            const testUsers = [
+                { username: 'admin', password: 'password' },
+                { username: 'main_branch', password: 'admin123' },
+                { username: 'woreda1_organization', password: 'woreda123' },
+                { username: 'woreda1_information', password: 'woreda123' },
+                { username: 'organization_admin', password: 'sector123' }
+            ];
+            
+            let results = 'Testing login for all users:\n\n';
+            
+            for (const user of testUsers) {
+                try {
+                    const response = await fetch(`${API_URL}/auth/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(user)
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        results += `✅ ${user.username}: SUCCESS (${data.user.role})\n`;
+                    } else {
+                        const data = await response.json();
+                        results += `❌ ${user.username}: FAILED (${data.error})\n`;
+                    }
+                } catch (error) {
+                    results += `❌ ${user.username}: ERROR (${error.message})\n`;
+                }
+            }
+            
+            resultDiv.innerHTML = `<div class="result info">${results}</div>`;
+        }
+
+        function checkEnvironment() {
+            const resultDiv = document.getElementById('env-result');
+            
+            const info = {
+                'Current URL': window.location.href,
+                'API URL': API_URL,
+                'Protocol': window.location.protocol,
+                'Hostname': window.location.hostname,
+                'Port': window.location.port || 'default',
+                'User Agent': navigator.userAgent
+            };
+            
+            let output = 'Environment Information:\n\n';
+            for (const [key, value] of Object.entries(info)) {
+                output += `${key}: ${value}\n`;
+            }
+            
+            output += '\n⚠️ Important:\n';
+            output += '- If API URL is localhost, it won\'t work in production\n';
+            output += '- Check VITE_API_URL environment variable in Vercel\n';
+            output += '- Backend must be deployed and accessible\n';
+            
+            resultDiv.innerHTML = `<div class="result info">${output}</div>`;
+        }
+
+        // Auto-test on load
+        window.onload = function() {
+            console.log('API URL:', API_URL);
+            testBackendConnection();
+        };
+    </script>
+</body>
+</html>

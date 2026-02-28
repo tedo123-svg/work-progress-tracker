@@ -1,8 +1,14 @@
 import { Resend } from 'resend';
 import crypto from 'crypto';
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend only if API key is available
+let resend = null;
+if (process.env.RESEND_API_KEY) {
+  resend = new Resend(process.env.RESEND_API_KEY);
+  console.log('✅ Resend service initialized');
+} else {
+  console.warn('⚠️ Resend API key not found - email functionality will be disabled');
+}
 
 // Generate 6-digit verification code
 export const generateVerificationCode = () => {
