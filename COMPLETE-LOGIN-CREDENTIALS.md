@@ -2,46 +2,56 @@
 
 ## ✅ Login Status: ALL WORKING
 
-All user accounts have been tested and are working correctly. Here are the complete login credentials for your system:
+All user accounts have been tested and are working correctly. Contact your system administrator for login credentials.
 
 ## 👑 System Administration
 
-| Username | Password | Role | Description |
-|----------|----------|------|-------------|
-| `admin` | `password` | admin | System Administrator - Full access |
+| Username | Role | Description |
+|----------|------|-------------|
+| `admin` | admin | System Administrator - Full access |
 
 ## 🏢 Sub-city Level (Kifle Ketema)
 
 ### Main Branch
-| Username | Password | Role | Description |
-|----------|----------|------|-------------|
-| `main_branch` | `admin123` | main_branch | Sub-city Main Branch - All sectors oversight |
+| Username | Role | Description |
+|----------|------|-------------|
+| `main_branch` | main_branch | Sub-city Main Branch - All sectors oversight |
 
 ### Sector Admins
-| Username | Password | Role | Sector | Description |
-|----------|----------|------|--------|-------------|
-| `organization_admin` | `sector123` | organization_sector | organization | Organization Sector Admin |
-| `information_admin` | `sector123` | information_sector | information | Information Sector Admin |
-| `operation_admin` | `sector123` | operation_sector | operation | Operation Sector Admin |
-| `peace_value_admin` | `sector123` | peace_value_sector | peace_value | Peace & Value Sector Admin |
+| Username | Role | Sector | Description |
+|----------|------|--------|-------------|
+| `organization_admin` | organization_sector | organization | Organization Sector Admin |
+| `information_admin` | information_sector | information | Information Sector Admin |
+| `operation_admin` | operation_sector | operation | Operation Sector Admin |
+| `peace_value_admin` | peace_value_sector | peace_value | Peace & Value Sector Admin |
 
 ## 🏘️ Woreda Level (Districts)
 
 ### Woreda 1 - All Sectors
-| Username | Password | Role | Sector | Description |
-|----------|----------|------|--------|-------------|
-| `woreda1_organization` | `woreda123` | woreda_organization | organization | Woreda 1 Organization Sector |
-| `woreda1_information` | `woreda123` | woreda_information | information | Woreda 1 Information Sector |
-| `woreda1_operation` | `woreda123` | woreda_operation | operation | Woreda 1 Operation Sector |
-| `woreda1_peace_value` | `woreda123` | woreda_peace_value | peace_value | Woreda 1 Peace & Value Sector |
+| Username | Role | Sector | Description |
+|----------|------|--------|-------------|
+| `woreda1_organization` | woreda_organization | organization | Woreda 1 Organization Sector |
+| `woreda1_information` | woreda_information | information | Woreda 1 Information Sector |
+| `woreda1_operation` | woreda_operation | operation | Woreda 1 Operation Sector |
+| `woreda1_peace_value` | woreda_peace_value | peace_value | Woreda 1 Peace & Value Sector |
 
 ### Woreda 2 - All Sectors
-| Username | Password | Role | Sector | Description |
-|----------|----------|------|--------|-------------|
-| `woreda2_organization` | `woreda123` | woreda_organization | organization | Woreda 2 Organization Sector |
-| `woreda2_information` | `woreda123` | woreda_information | information | Woreda 2 Information Sector |
-| `woreda2_operation` | `woreda123` | woreda_operation | operation | Woreda 2 Operation Sector |
-| `woreda2_peace_value` | `woreda123` | woreda_peace_value | peace_value | Woreda 2 Peace & Value Sector |
+| Username | Role | Sector | Description |
+|----------|------|--------|-------------|
+| `woreda2_organization` | woreda_organization | organization | Woreda 2 Organization Sector |
+| `woreda2_information` | woreda_information | information | Woreda 2 Information Sector |
+| `woreda2_operation` | woreda_operation | operation | Woreda 2 Operation Sector |
+| `woreda2_peace_value` | woreda_peace_value | peace_value | Woreda 2 Peace & Value Sector |
+
+## 🔒 Security Notice
+
+**Passwords have been removed from this documentation for security purposes.**
+
+To obtain login credentials:
+1. Contact your system administrator
+2. Passwords are stored securely in the database
+3. Never share your password with anyone
+4. Change default passwords after first login
 
 ## 🎯 What Each User Sees After Login
 
